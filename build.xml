@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+
+<project name="cask_bulid" default="package" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+	<property name="conf.dir" value="conf"/>
+	<property name="lib.dir" value="lib"/>
+	<property name="testlib.dir" value="testlib"/>
+	<property name="bin.dir" value="bin"/>
+	<property name="src.dir" value="src"/>
+	<property name="temp.dir" value="temp"/>
+	<property name="logs.dir" value="logs"/>
+	<property name="dist.dir" value="target"/>
+	<property name="classes.dir" value="classes"/>
+	<property name="release.txt" value="RELEASE_NOTES.txt"/>
+	<property name="test.dir" value="test"/>
+	<property name="report.dir" value="report"/>
+	
+	<property file="${src.dir}/version.properties"/>
+	<property name="version" value="${VERSION}"/>
+	<property name="jar.name" value="${ant.project.name}-${version}.jar"/>
+<!--
+	<property environment="env"/>
+        <property name="github.repo.local" value="${env.GITHUB_MAVEN_REPO}"/>
+-->
+	
+	<path id="libraries">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+	<target name="clean">
+			<delete dir="${classes.dir}"/>
+			<delete dir="${dist.dir}"/>
+		</target>
+	
+	<target name="init">
+		<mkdir dir="${classes.dir}"/>
+		<mkdir dir="${dist.dir}"/>
+	</target>
+	
+	<target name="compile" depends="clean, init">
+		<javac debug="true" srcdir="${src.dir}" destdir="${classes.dir}" 
+				classpathref="libraries" includeantruntime="false" />
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="package" depends="compile">
+		<copy todir="${dist.dir}/${bin.dir}">
+			<fileset dir="${bin.dir}" />
+		</copy>
+		<copy todir="${dist.dir}/${conf.dir}">
+			<fileset dir="${conf.dir}"/>
+		</copy>
+		<copy todir="${dist.dir}/${lib.dir}">
+			<fileset dir="${lib.dir}"/>
+		</copy>
+		<mkdir dir="${dist.dir}/${temp.dir}"/>
+		<mkdir dir="${dist.dir}/${logs.dir}"/>
+		<mkdir dir="${dist.dir}/${test.dir}"/>
+		<copy file="${release.txt}" todir="${dist.dir}"/>
+		<jar jarfile="${dist.dir}/${bin.dir}/${jar.name}" basedir="${classes.dir}" />
+	</target>
+	<target name="resolve" description="--> retreive dependencies with ivy">
+            <ivy:retrieve type="jar" sync="true"/>
+        </target> 
+	
+	<target name="report" depends="resolve" description="--> generates a report of dependencies">
+	    <ivy:report todir="${build.dir}"/>
+	</target>
+	<target name="clean-cache" description="--> clean the ivy cache">
+		<ivy:cleancache />
+	</target>
+	
+    <target name="test" description="junit tests">
+        <exec executable="/bin/bash" failonerror="true">
+        	<arg value="${dist.dir}/${bin.dir}/unittest.sh"/>
+        </exec>
+    </target>
+	
+    <target name="publish" depends="resolve, package" description="Publish this build into repository">
+        <property name="ivy.local.default.ivy.pattern" value="[organisation]/[module]/[type]s/[artifact]-[revision].[ext]" />
+        <property name="ivy.local.default.artifact.pattern" value="[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"  />
+        <ivy:publish pubrevision="${version}" status="release" resolver="local" overwrite="true" >
+               <artifacts pattern="target/bin/[artifact]-[revision].[ext]"/>
+        </ivy:publish>
+    </target>
+<!--
+    <target name="github" depends="resolve, package" description="Publish this build into repository">
+        <property name="ivy.local.default.ivy.pattern" value="[organisation]/[module]/[type]s/[artifact]-[revision].[ext]" />
+        <property name="ivy.local.default.artifact.pattern" value="[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"  />
+        <ivy:publish pubrevision="${version}" status="release" resolver="github-repo-local" overwrite="true" >
+               <artifacts pattern="target/bin/[artifact]-[revision].[ext]"/>
+        </ivy:publish>
+    </target>
+-->
+<!--
+    <property environment="env"></property>
+	<property name="findbugs.home" value="${env.FINDBUGS_HOME}"/>
+	 <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+	 <target name="findbugs">
+	 	<findbugs home="${findbugs.home}"
+	              output="xml:withMessages"
+	              outputFile="findbugs.xml" >
+	      <sourcePath path="${src.dir}/" />
+	      <class location="${classes.dir}" />
+	    </findbugs>
+	  </target>
+-->
+</project>
+

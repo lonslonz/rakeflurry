@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<configuration>
+    <server name="localhost" port="8080" contextPath="/cask" maxThreads="512"/>
+    <services>
+        <service url="/service/simpleget" 
+                 class="com.skplanet.cask.service.SimpleRequestService" 
+                 exec="request" 
+                 method="get"/>
+        <service url="/service/simplepost" 
+                 class="com.skplanet.cask.service.SimpleRequestService" 
+                 exec="request" 
+                 method="post"/>
+        <service url="/service/simplebatch" 
+                 class="com.skplanet.cask.service.SimpleBatchService" 
+                 exec="batch" 
+                 method="post"
+                 sleepMSec="10000 "/>
+    </services>
+
+    <datasources>
+    <!-- 
+        <datasource id = "caskRuntime">
+            <driverClassName>com.mysql.jdbc.Driver</driverClassName>
+            <url>jdbc:mysql://localhost:3306/cask_test?autoReconnect=true</url>
+            <username>lons</username>
+            <password>1234</password>
+            <initSQL>SELECT 1</initSQL>
+            <initialSize>10</initialSize>
+            <minIdle>10</minIdle>
+            <maxIdle>100</maxIdle>
+            <maxActive>100</maxActive>
+            <defaultAutoCommit>false</defaultAutoCommit>
+            <validateQuery>SELECT 1</validateQuery>
+        </datasource>
+         -->
+    </datasources>
+    
+    <properties>
+        <property key = "saveRuntimeIntoDb" value = "false"/>
+        <property key = "runtimeDb" value = "caskRuntime"/>
+    </properties>
+
+</configuration>
