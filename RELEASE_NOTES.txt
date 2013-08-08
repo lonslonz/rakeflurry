@@ -1,8 +1,11 @@
 
-                   Vesion 0.2.0
+                   Rakeflurry Vesion 0.3.0
                    Release Notes
 
 --------------------
+0.3.0
+- keymap service: show, update
+- collect service except using hadoop
 
 0.2.0
 - construct dev env. 
