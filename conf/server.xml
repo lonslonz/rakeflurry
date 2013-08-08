@@ -7,11 +7,11 @@
                  class="com.skplanet.rakeflurry.service.RakeFlurry" 
                  exec="request" 
                  method="post"/> 
-        <service url="/apikey/show" 
+        <service url="/keymap/show" 
                  class="com.skplanet.rakeflurry.service.ShowKeyMap" 
                  exec="request" 
                  method="get"/>
-        <service url="/apikey/update" 
+        <service url="/keymap/overwrite" 
                  class="com.skplanet.rakeflurry.service.OverwriteKeyMap" 
                  exec="request" 
                  method="post"/>
