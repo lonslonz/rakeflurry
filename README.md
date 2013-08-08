@@ -1,2 +1,2 @@
-cask_build
+rakeflurry
 ==========

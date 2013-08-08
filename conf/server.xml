@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 
 <configuration>
-    <server name="localhost" port="8080" contextPath="/cask" maxThreads="512"/>
+    <server name="localhost" port="8100" contextPath="/rakeflurry" maxThreads="512" staticErrorRedirect="/error.jsp"/>
     <services>
-        <service url="/service/simpleget" 
-                 class="com.skplanet.cask.service.SimpleRequestService" 
+        <service url="/collect" 
+                 class="com.skplanet.rakeflurry.service.RakeFlurry" 
+                 exec="request" 
+                 method="post"/> 
+        <service url="/apikey/show" 
+                 class="com.skplanet.rakeflurry.service.ShowKeyMap" 
                  exec="request" 
                  method="get"/>
-        <service url="/service/simplepost" 
-                 class="com.skplanet.cask.service.SimpleRequestService" 
+        <service url="/apikey/update" 
+                 class="com.skplanet.rakeflurry.service.OverwriteKeyMap" 
                  exec="request" 
                  method="post"/>
-        <service url="/service/simplebatch" 
-                 class="com.skplanet.cask.service.SimpleBatchService" 
-                 exec="batch" 
-                 method="post"
-                 sleepMSec="10000 "/>
+        <service url="/error" 
+                 class="com.skplanet.cask.service.ErrorRedirect" 
+                 exec="request"
+                 method="get"/>
     </services>
 
     <datasources>
@@ -39,6 +42,8 @@
     <properties>
         <property key = "saveRuntimeIntoDb" value = "false"/>
         <property key = "runtimeDb" value = "caskRuntime"/>
+        <property key = "dataDir" value = "D:\cask_home\rakeflurry\data"/>
+        <property key = "apiCallTimeInterval" value = "1200"/>        
     </properties>
 
 </configuration>

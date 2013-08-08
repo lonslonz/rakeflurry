@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>cask</name>
+	<name>rakeflurry</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -15,4 +15,11 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.apache.ivyde.eclipse.ivynature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src_cask</name>
+			<type>2</type>
+			<location>D:/work/SKPlanet/git_workspace/cask/src</location>
+		</link>
+	</linkedResources>
 </projectDescription>

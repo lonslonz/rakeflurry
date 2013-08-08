@@ -29,6 +29,7 @@ do
      CLASSPATH=$CLASSPATH:$LIB_FILE
 done
 
+CLASSPATH=$JAVA_HOME/lib/tools.jar:$CLASSPATH
 
 PID=$TEMP_DIR/process.pid
 

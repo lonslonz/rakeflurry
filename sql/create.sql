@@ -1,54 +1,83 @@
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
+
+DROP TABLE tb_keymap;
+CREATE TABLE tb_keymap 
+( 
+id INT NOT NULL AUTO_INCREMENT,
+access_code VARCHAR(256) NOT NULL,
+api_key VARCHAR(256) NOT NULL,
+api_key_name VARCHAR(256) DEFAULT NULL,
+used INT DEFAULT 1,
+update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+PRIMARY KEY(id)
+);
+DROP TABLE tb_appmetrics;
+CREATE TABLE tb_appmetrics
+( 
+id INT NOT NULL AUTO_INCREMENT,
+metric_name VARCHAR(256) NOT NULL,
+used INT DEFAULT 1,
+update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+PRIMARY KEY(id)
+);
 
 
--- -----------------------------------------------------
--- Table `tb_server_runtime`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `tb_server_runtime` ;
+DROP TABLE tb_dashboard;
+CREATE TABLE tb_dashboard
+(
+dashboard_id INT NOT NULL AUTO_INCREMENT,
+total_count INT DEFAULT NULL,
+start_time DATETIME DEFAULT NULL,
+finish_time DATETIME DEFAULT NULL,
+start_time_file_code VARCHAR(32) DEFAULT NULL,
+update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+PRIMARY KEY (dashboard_id)
+);
 
-CREATE  TABLE IF NOT EXISTS `tb_server_runtime` (
-  `server_runtime_id` INT NOT NULL AUTO_INCREMENT ,
-  `server` VARCHAR(52) NULL ,
-  `port` INT NULL ,
-  `server_home` VARCHAR(512) NULL ,
-  `version` VARCHAR(52) NULL ,
-  `status` VARCHAR(32) NULL DEFAULT NULL ,
-  `begin_time` DATETIME NULL DEFAULT NULL ,
-  `end_time` DATETIME NULL DEFAULT NULL ,
-  `update_time` DATETIME NULL DEFAULT NULL ,
-  PRIMARY KEY (`server_runtime_id`) )
-ENGINE = InnoDB;
-
-CREATE UNIQUE INDEX `idx_server` ON `tb_server_runtime` (`server` ASC, `port` ASC, `begin_time` ASC) ;
-
-
--- -----------------------------------------------------
--- Table `tb_service_runtime`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `tb_service_runtime` ;
-
-CREATE  TABLE IF NOT EXISTS `tb_service_runtime` (
-  `service_runtime_id` INT NOT NULL AUTO_INCREMENT ,
-  `server_runtime_id` INT NOT NULL ,
-  `url` VARCHAR(52) NULL ,
-  `service_type` VARCHAR(32) NULL DEFAULT NULL ,
-  `service_class` VARCHAR(512) NULL DEFAULT NULL ,
-  `mbean_class` VARCHAR(512) NULL DEFAULT NULL ,
-  `exec_type` VARCHAR(32) NULL DEFAULT NULL ,
-  `status` VARCHAR(32) NULL DEFAULT NULL ,
-  `reg_time` DATETIME NULL DEFAULT NULL ,
-  `update_time` DATETIME NULL DEFAULT NULL ,
-  PRIMARY KEY (`service_runtime_id`) )
-ENGINE = InnoDB;
-
-CREATE UNIQUE INDEX `idx_server` ON `tb_service_runtime` (`server_runtime_id` ASC, `url` ASC) ;
-
-CREATE INDEX `fk_tb_service_tb_server1` ON `tb_service_runtime` (`server_runtime_id` ASC) ;
+DROP TABLE tb_accesscode;
+CREATE TABLE tb_accesscode
+(
+accesscode_id INT NOT NULL AUTO_INCREMENT,
+dashboard_id INT NOT NULL ,
+access_code VARCHAR(256) NOT NULL,
+start_time DATETIME DEFAULT NULL,
+finish_time DATETIME DEFAULT NULL,
+total_count INT DEFAULT NULL,
+running_status VARCHAR(32) DEFAULT NULL,
+source_uri VARCHAR(1024) DEFAULT NULL,
+update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+PRIMARY KEY (accesscode_id)
+);
 
 
+DROP TABLE tb_apikey;
+CREATE TABLE tb_apikey
+(
+apikey_id INT NOT NULL AUTO_INCREMENT,
+accesscode_id INT NOT NULL ,
+apikey VARCHAR(256) NOT NULL,
+NAME VARCHAR(256) DEFAULT NULL,
+start_time DATETIME DEFAULT NULL,
+finish_time DATETIME DEFAULT NULL,
+total_count INT DEFAULT NULL,
+running_status VARCHAR(32) DEFAULT NULL,
+filename VARCHAR(1024) DEFAULT NULL,
+update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+PRIMARY KEY (apikey_id)
+);
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+DROP TABLE tb_api;
+CREATE TABLE tb_api
+(
+api_id INT NOT NULL AUTO_INCREMENT,
+apikey_id INT NOT NULL,
+api VARCHAR(256) NOT NULL,
+start_time DATETIME DEFAULT NULL,
+finish_time DATETIME DEFAULT NULL,
+elapsed INT DEFAULT NULL,
+running_status VARCHAR(32) DEFAULT NULL,
+uri VARCHAR(1024) DEFAULT NULL,
+req_url VARCHAR(1024) DEFAULT NULL,
+retry_count INT DEFAULT 0,
+update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+PRIMARY KEY (api_id)
+);

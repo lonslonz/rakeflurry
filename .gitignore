@@ -94,7 +94,7 @@ DocProject/Help/html
 publish
 
 # Others
-[Bb]in
+#[Bb]in
 [Oo]bj
 TestResults
 *.Cache
@@ -156,3 +156,4 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+/output

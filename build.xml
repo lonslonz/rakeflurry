@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 
-<project name="cask_bulid" default="package" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="rakeflurry" default="package" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 	<property name="conf.dir" value="conf"/>
 	<property name="lib.dir" value="lib"/>
 	<property name="testlib.dir" value="testlib"/>
 	<property name="bin.dir" value="bin"/>
 	<property name="src.dir" value="src"/>
-	<property name="temp.dir" value="temp"/>
+	<property name="web.dir" value="web"/>
 	<property name="logs.dir" value="logs"/>
 	<property name="dist.dir" value="target"/>
 	<property name="classes.dir" value="classes"/>
@@ -59,7 +59,9 @@
 		<copy todir="${dist.dir}/${lib.dir}">
 			<fileset dir="${lib.dir}"/>
 		</copy>
-		<mkdir dir="${dist.dir}/${temp.dir}"/>
+		<copy todir="${dist.dir}/${web.dir}">
+			<fileset dir="${web.dir}"/>
+		</copy>
 		<mkdir dir="${dist.dir}/${logs.dir}"/>
 		<mkdir dir="${dist.dir}/${test.dir}"/>
 		<copy file="${release.txt}" todir="${dist.dir}"/>
@@ -88,6 +90,12 @@
         <ivy:publish pubrevision="${version}" status="release" resolver="local" overwrite="true" >
                <artifacts pattern="target/bin/[artifact]-[revision].[ext]"/>
         </ivy:publish>
+    </target>
+    <target name="tar" depends="package">
+        <tar compression="gzip" destfile="${ant.project.name}-${version}.tar.gz">
+            <tarfileset dir="${dist.dir}" prefix="${dist.dir}">
+            </tarfileset>
+        </tar>
     </target>
 <!--
     <target name="github" depends="resolve, package" description="Publish this build into repository">

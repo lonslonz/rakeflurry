@@ -22,8 +22,22 @@
     <info organisation="com.skplanet" module="myserver">
 	</info>
     <dependencies>
-    	<dependency org="com.skplanet" name="cask" rev="1.0.4" transitive="true"/>
-          
+    	<dependency org="com.skplanet" name="cask" rev="latest.integration" transitive="true"/>
+    
+    	<dependency org="org.hibernate" name="hibernate-core" rev="4.2.3.Final" transitive="true" />
+    <!--         
+       
+        <dependency org="org.hibernate" name="hibernate-entitymanager" rev="3.6.10.Final"  transitive="false"/>
+        <dependency org="org.hibernate" name="ejb3-persistence" rev="1.0.2.GA" transitive="false"/>
+        <dependency org="org.hibernate" name="hibernate-commons-annotations" rev="3.2.0.Final" transitive="false"/>
+        <dependency org="org.hibernate" name="hibernate-annotations" rev="3.5.6-Final" transitive="false"/>
+        <dependency org="dom4j" name="dom4j" rev="1.6.1"  transitive="false"/>
+        <dependency org="org.jboss.logging" name="jboss-logging" rev="3.1.2.GA" transitive="false"/>
+        <dependency org="javax.transaction" name="jta" rev="1.1" transitive="false"/>
+        <dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" transitive="false"/>
+        <dependency org="jboss" name="javassist" rev="3.7.ga"  transitive="false"/>
+        <dependency org="antlr" name="antlr" rev="2.7.7" transitive="false"/>
+         -->       
     </dependencies>
 </ivy-module>
         	
