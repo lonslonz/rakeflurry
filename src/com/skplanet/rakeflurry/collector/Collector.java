@@ -17,7 +17,6 @@ public class Collector {
     }
     
     public void collect() throws Exception {
-        
         AppMetrics appMetrics = new AppMetrics(params);
         appMetrics.collect();
     }

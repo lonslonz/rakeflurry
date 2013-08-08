@@ -17,6 +17,7 @@ import com.skplanet.cask.container.ServiceRuntimeInfo;
 import com.skplanet.cask.container.model.SimpleParams;
 import com.skplanet.cask.container.service.SimpleService;
 import com.skplanet.cask.util.StringUtil;
+import com.skplanet.rakeflurry.collector.UserManager;
 import com.skplanet.rakeflurry.db.HiberUtil;
 import com.skplanet.rakeflurry.db.KeyMapDao;
 import com.skplanet.rakeflurry.model.KeyMapModel;
@@ -46,15 +47,19 @@ public class OverwriteKeyMap implements SimpleService {
     @Override
     public void handle(SimpleParams request, SimpleParams response, ServiceRuntimeInfo runtimeInfo) throws Exception {
         
-        logger.info("start update api key : {} ", request.getParams());
+        logger.info("start overwrite keymap : {} ", request.getParams());
+        if(!UserManager.validate(request.get("id"), request.get("password"))) {
+            throw new Exception("id or password not valid.");
+        }
+        
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
             Map<String, Object> data = request.getParams();
             
             ObjectMapper mapper = new ObjectMapper();
             List keyMapList = mapper.convertValue(request.get("keymap"), List.class);
-            Iterator it = keyMapList.iterator();
             
+            Iterator it = keyMapList.iterator();
             List<KeyMapDao> keyMapSourceList = new ArrayList<KeyMapDao>();
             List<String> accessCodeList = new ArrayList<String>();
             while(it.hasNext()) {
@@ -82,7 +87,7 @@ public class OverwriteKeyMap implements SimpleService {
             logger.error(StringUtil.exception2Str(e));
         } finally {
             response.setParams(resultMap);
-            logger.info("complete update api key : {} ", response.getParams());
+            logger.info("complete overwrite key map : {} ", response.getParams());
         }
     }
     

@@ -20,7 +20,6 @@ import com.skplanet.cask.container.service.SimpleService;
 import com.skplanet.rakeflurry.db.HiberUtil;
 import com.skplanet.rakeflurry.db.KeyMapDao;
 import com.skplanet.rakeflurry.model.KeyMapModel;
-import com.skplanet.service.SimpleRequestService;
 
 public class ShowKeyMap implements SimpleService {
     private Logger logger = LoggerFactory.getLogger(ShowKeyMap.class);

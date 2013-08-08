@@ -42,8 +42,10 @@
     <properties>
         <property key = "saveRuntimeIntoDb" value = "false"/>
         <property key = "runtimeDb" value = "caskRuntime"/>
-        <property key = "dataDir" value = "D:\cask_home\rakeflurry\data"/>
+        <property key = "dataDir" value = "/userdata/cask_home/rakeflurry/data"/>
         <property key = "apiCallTimeInterval" value = "1200"/>        
+        <property key = "id" value = "lons"/>
+        <property key = "password" value = "dlwhdals"/>
     </properties>
 
 </configuration>

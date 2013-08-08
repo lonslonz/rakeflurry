@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Map;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.ObjectMapper;
 
 
@@ -22,6 +23,9 @@ public class CollectParams {
     
     private String endDay;
     private String startDay;
+       
+    private String id;
+    private String password;
     
     public void init() {
         
@@ -39,7 +43,7 @@ public class CollectParams {
         
         startDay = dateFormat.format(cal.getTime());
     }
-    
+
     public Integer getDuration() {
         return duration;
     }
@@ -79,6 +83,22 @@ public class CollectParams {
 
     public void setStartDay(String startDay) {
         this.startDay = startDay;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
     
     

@@ -17,6 +17,7 @@ import com.skplanet.cask.container.service.SimpleService;
 import com.skplanet.rakeflurry.collector.AppMetrics;
 import com.skplanet.rakeflurry.collector.CollectParams;
 import com.skplanet.rakeflurry.collector.Collector;
+import com.skplanet.rakeflurry.collector.UserManager;
 import com.skplanet.rakeflurry.dashboard.DashBoard;
 import com.skplanet.rakeflurry.meta.AppMetricsApi;
 import com.skplanet.rakeflurry.meta.FileManager;
@@ -55,17 +56,24 @@ public class RakeFlurry implements SimpleService {
     @Override
     public void handle(SimpleParams request, SimpleParams response, ServiceRuntimeInfo runtimeInfo) throws Exception {
         
+        logger.info("collect service start. {}", request.getParams());
+        
+        if(!UserManager.validate(request.get("id"), request.get("password"))) {
+            throw new Exception("id or password not valid.");
+        }
+        
         if(!ownRight()) {
             logger.warn("request when execution already exists.");
             throw new Exception("execution already exists");
         }
-        
+                
         try {
             Map<String, Object> data = request.getParams();
             Iterator<String> it = data.keySet().iterator();
             
             ObjectMapper mapper = new ObjectMapper();
-            CollectParams params = mapper.convertValue(request.getParams(), CollectParams.class);
+            CollectParams params = mapper.convertValue(request.get("options"), CollectParams.class);
+            
             params.init();
             
             FileManager.getInstance().init();
@@ -82,7 +90,7 @@ public class RakeFlurry implements SimpleService {
             resultMap.put("results",  DashBoard.getInstance());
             
             response.setParams(resultMap);
-            logger.info("simple service response : {} ", response.getParams());
+            logger.info("collect service response : {} ", response.getParams());
         } finally {
             releaseRight();
         }
