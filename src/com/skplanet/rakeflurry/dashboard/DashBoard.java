@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -15,13 +16,17 @@ import javax.persistence.Table;
 
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.skplanet.rakeflurry.db.HiberUtil;
+import com.skplanet.rakeflurry.db.KeyMapDao;
 import com.skplanet.rakeflurry.meta.KeyMapDef;
 import com.skplanet.rakeflurry.model.KeyMapModel;
 
@@ -29,7 +34,7 @@ import com.skplanet.rakeflurry.model.KeyMapModel;
 @Table(name="tb_dashboard")
 public class DashBoard {
     private Logger logger = LoggerFactory.getLogger(DashBoard.class);
-    private static DashBoard instance = new DashBoard();
+    //private static DashBoard instance = new DashBoard();
     
     private List<AccessCodeSummary> accessCodeSummaries = new ArrayList<AccessCodeSummary>();
     
@@ -42,9 +47,9 @@ public class DashBoard {
     @JsonIgnore
     private String updateTime = null;
     
-    public synchronized static DashBoard getInstance() {
-        return instance;
-    }
+//    public synchronized static DashBoard getInstance() {
+//        return instance;
+//    }
     public void init(KeyMapDef keyMapDef) {
         accessCodeSummaries.clear();
         
@@ -52,10 +57,9 @@ public class DashBoard {
         
         while(it.hasNext()) {
             KeyMapModel kmm = (KeyMapModel)it.next();
-            String accessCode = kmm.getAccessCode(); 
             AccessCodeSummary as = new AccessCodeSummary();
             accessCodeSummaries.add(as);
-            as.init(accessCode, kmm.getApiKeys(), this);
+            as.init( kmm.getAccessCode(), kmm.getMbrNo(), kmm.getApiKeys(), this);
         }
         totalCount = accessCodeSummaries.size();
         logger.info("dashboard initialized. total {} access code.", totalCount);
@@ -66,7 +70,7 @@ public class DashBoard {
         try {
             tx = session.beginTransaction();
             
-            Integer id = (Integer)session.save(DashBoard.getInstance());
+            Integer id = (Integer)session.save(this);
             tx.commit();
             logger.info("save dashboard into db. id : {}", id);
         } catch (Exception e) {
@@ -99,7 +103,105 @@ public class DashBoard {
         }
         
     }
-    
+    public static List<DashBoard> selectAll() throws Exception {
+        Session session = HiberUtil.openSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            
+            String hql  = "from DashBoard D order by D.startTime desc";
+            Query query = session.createQuery(hql);
+            
+            List result = query.list();
+            Iterator itRes = result.iterator();
+            
+            List<DashBoard> dashboardList = (List<DashBoard>)result;
+            
+            tx.commit();
+            return result;
+        } catch(Exception e) {
+            if(tx != null) {
+                tx.rollback();
+            }
+            throw e;
+        } finally {
+            session.close();
+        }
+    }
+    public static DashBoard selectLastOne() throws Exception {
+        Session session = HiberUtil.openSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            
+            String hql  = "from DashBoard D order by dashboard_id desc ";
+            Query query = session.createQuery(hql);
+            query.setMaxResults(1);
+            
+            DashBoard resultBoard = (DashBoard)query.uniqueResult();
+            
+            tx.commit();
+            return resultBoard;
+        } catch(Exception e) {
+            if(tx != null) {
+                tx.rollback();
+            }
+            throw e;
+        } finally {
+            session.close();
+        }
+    }
+    public static List<DashBoard> selectByDate(String date) throws Exception {
+        Session session = HiberUtil.openSession();
+        Transaction tx = null;
+        String begin = date + " 00:00:00";
+        String end = date + " 23:59:59";
+        try {
+            tx = session.beginTransaction();
+            
+            String hql  = "from DashBoard D where D.startTime >= :begin and D.startTime < :end " + 
+                          "order by D.startTime desc";
+            Query query = session.createQuery(hql);
+            query.setParameter("begin", begin);
+            query.setParameter("end", end);
+            
+            List<DashBoard> boardList = (List<DashBoard>)query.list();
+            
+            tx.commit();
+            return boardList;
+        } catch(Exception e) {
+            if(tx != null) {
+                tx.rollback();
+            }
+            throw e;
+        } finally {
+            session.close();
+        }
+    }
+    public static DashBoard selectById(Integer id) throws Exception {
+        Session session = HiberUtil.openSession();
+        Transaction tx = null;
+        
+        try {
+            tx = session.beginTransaction();
+            
+            String hql  = "from DashBoard D where D.dashboardId = :id"; 
+            Query query = session.createQuery(hql);
+            query.setParameter("id", id);
+            
+            DashBoard dashboard = (DashBoard)query.uniqueResult();
+            
+            tx.commit();
+            return dashboard;
+        } catch(Exception e) {
+            if(tx != null) {
+                tx.rollback();
+            }
+            throw e;
+        } finally {
+            session.close();
+        }
+    }
     public AccessCodeSummary getAccessCodeSummary(String accessCode) {
         
         for(int i = 0; i < accessCodeSummaries.size(); ++i) {
@@ -163,7 +265,9 @@ public class DashBoard {
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
-    @OneToMany( cascade = CascadeType.ALL, mappedBy="parDashBoard")
+    @JsonProperty("mbrNoSummaries")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="parDashBoard", fetch=FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     public List<AccessCodeSummary> getAccessCodeSummaries() {
         return accessCodeSummaries;
     }

@@ -11,25 +11,37 @@ import javax.persistence.Table;
 @Entity
 @Table(name="tb_keymap")
 public class KeyMapDao {
-    private Integer id;
-    private String accessCode;
+    private String id;
+    private String mbrNo;
     private String apiKey;
+    
+    private String accessCode;
     private String apiKeyName;
     private Integer used = 1;
     private Date updateTime;
     
     @Id @GeneratedValue
     @Column(name = "id")
-    public Integer getId() {
+    public String getId() {
         return id;
     }
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
+
+    @Column(name = "mbr_no")
+    public String getMbrNo() {
+        return mbrNo;
+    }
+    public void setMbrNo(String mbrNo) {
+        this.mbrNo = mbrNo;
+    }
+    
     @Column(name = "access_code")
     public String getAccessCode() {
         return accessCode;
     }
+
     public void setAccessCode(String accessCode) {
         this.accessCode = accessCode;
     }

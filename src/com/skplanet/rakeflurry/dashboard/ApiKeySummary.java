@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -16,6 +17,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import com.skplanet.rakeflurry.meta.AppMetricsApi;
 
@@ -35,6 +38,7 @@ public class ApiKeySummary {
     private RunningStatus runningStatus = RunningStatus.STANDBY;
     private String fileName = null;
     private String updateTime = null;
+    private String errorMsg = null;
     
     public void init(String apiKey, List<String> apiList, AccessCodeSummary parent) {
         
@@ -59,7 +63,8 @@ public class ApiKeySummary {
     public void setParAccessCodeSummary(AccessCodeSummary parAccessCodeSummary) {
         this.parAccessCodeSummary = parAccessCodeSummary;
     }    
-    @OneToMany( cascade = CascadeType.ALL, mappedBy="parApiKeySummary")
+    @OneToMany( cascade = CascadeType.ALL, mappedBy="parApiKeySummary", fetch=FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     public List<ApiSummary> getApiSummaries() {
         return apiSummaries;
     }
@@ -127,5 +132,19 @@ public class ApiKeySummary {
     }
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
+    }
+    @Column(name="error_msg")
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
+    public void setErrorMsgLimit(String errorMsg) {
+        if(errorMsg != null) {
+            setErrorMsg(errorMsg.substring(1, 2046));
+        } else {
+            setErrorMsg(errorMsg);
+        }
     }
 }

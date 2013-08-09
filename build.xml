@@ -68,7 +68,8 @@
 		<jar jarfile="${dist.dir}/${bin.dir}/${jar.name}" basedir="${classes.dir}" />
 	</target>
 	<target name="resolve" description="--> retreive dependencies with ivy">
-            <ivy:retrieve type="jar" sync="true"/>
+            <!-- <ivy:retrieve type="jar" sync="true"/> -->
+            <ivy:retrieve type="jar,bundle" sync="true"/>
         </target> 
 	
 	<target name="report" depends="resolve" description="--> generates a report of dependencies">

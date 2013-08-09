@@ -1,5 +1,6 @@
 package com.skplanet.rakeflurry.service;
 
+import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -14,13 +15,15 @@ import org.slf4j.LoggerFactory;
 import com.skplanet.cask.container.ServiceRuntimeInfo;
 import com.skplanet.cask.container.model.SimpleParams;
 import com.skplanet.cask.container.service.SimpleService;
+import com.skplanet.cask.util.StringUtil;
 import com.skplanet.rakeflurry.collector.AppMetrics;
 import com.skplanet.rakeflurry.collector.CollectParams;
 import com.skplanet.rakeflurry.collector.Collector;
 import com.skplanet.rakeflurry.collector.UserManager;
 import com.skplanet.rakeflurry.dashboard.DashBoard;
+import com.skplanet.rakeflurry.file.FileManager;
+import com.skplanet.rakeflurry.file.FileSystemHelper;
 import com.skplanet.rakeflurry.meta.AppMetricsApi;
-import com.skplanet.rakeflurry.meta.FileManager;
 import com.skplanet.rakeflurry.meta.KeyMapDef;
 
 //TODO :
@@ -38,8 +41,8 @@ import com.skplanet.rakeflurry.meta.KeyMapDef;
 // accessCodeWorkRange : { start : 0, end : n-1 } -- when start : -1 : all
 // apiCodeStartIndex
 
-public class RakeFlurry implements SimpleService {
-    private Logger logger = LoggerFactory.getLogger(RakeFlurry.class);
+public class CollectApi implements SimpleService {
+    private Logger logger = LoggerFactory.getLogger(CollectApi.class);
     private static Boolean owned = false;
     
     private synchronized static Boolean ownRight() {
@@ -56,7 +59,7 @@ public class RakeFlurry implements SimpleService {
     @Override
     public void handle(SimpleParams request, SimpleParams response, ServiceRuntimeInfo runtimeInfo) throws Exception {
         
-        logger.info("collect service start. {}", request.getParams());
+        logger.info("start collect service. {}", request.getParams());
         
         if(!UserManager.validate(request.get("id"), request.get("password"))) {
             throw new Exception("id or password not valid.");
@@ -66,8 +69,10 @@ public class RakeFlurry implements SimpleService {
             logger.warn("request when execution already exists.");
             throw new Exception("execution already exists");
         }
-                
+            
+        Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
+            
             Map<String, Object> data = request.getParams();
             Iterator<String> it = data.keySet().iterator();
             
@@ -79,19 +84,27 @@ public class RakeFlurry implements SimpleService {
             FileManager.getInstance().init();
             AppMetricsApi.getInstance().init();
             KeyMapDef.getInstance().init();
-            DashBoard.getInstance().init(KeyMapDef.getInstance());
-            DashBoard.getInstance().saveAllIntoDb();
             
-            Collector collector = new Collector(params);
+            DashBoard dashboard = new DashBoard();
+            dashboard.init(KeyMapDef.getInstance());
+            dashboard.saveAllIntoDb();
+            
+            Collector collector = new Collector(params, dashboard);
             collector.collect();
             
-            Map<String, Object> resultMap = new HashMap<String, Object>();
             //resultMap.put("AccessCodeSummaries",  DashBoard.getInstance().getAccessCodeSummaries());
-            resultMap.put("results",  DashBoard.getInstance());
+            resultMap.put("results",  dashboard);
             
             response.setParams(resultMap);
-            logger.info("collect service response : {} ", response.getParams());
-        } finally {
+            logger.info("complete collect service : {} ", response.getParams());
+        } catch(Exception e) {
+            resultMap.put("returnCode",  -1);
+            resultMap.put("returnDesc",  "fail");
+            resultMap.put("message", e.getMessage());
+            logger.error(StringUtil.exception2Str(e));
+            throw e;
+        }
+        finally {
             releaseRight();
         }
     }

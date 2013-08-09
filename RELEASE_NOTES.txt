@@ -1,8 +1,15 @@
 
-                   Rakeflurry Vesion 0.3.0
+                   Rakeflurry Vesion 0.4.0
                    Release Notes
 
 --------------------
+0.4.0
+- PK changed : accessCode to mbrNo
+- show jobs service added.
+- many service can use dashboard class.
+- add user management.
+- data file copy to hdfs. hadoop 2.0.0-alpha
+
 0.3.0
 - keymap service: show, update
 - collect service except using hadoop

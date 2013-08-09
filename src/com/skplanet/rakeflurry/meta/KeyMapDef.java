@@ -26,43 +26,103 @@ public class KeyMapDef {
         return instance;
     }
     // TODO : get from DB
-    public void init() {
+    public void init() throws Exception {
         
         keyMapList.clear();
         keyMapList = getDataFromDb();
         logger.info("read keymap from db");
     }
-    public List<KeyMapModel> getDataFromDb() {
+    public static List<KeyMapModel> getDataFromDb() throws Exception {
         Session session = HiberUtil.openSession();
-        Transaction tx = session.beginTransaction();
-        
-        String hql  = "from KeyMapDao K where K.used = 1 order by K.accessCode, K.apiKey ";
-        Query query = session.createQuery(hql);
-        
-        List result = query.list();
-        Iterator itRes = result.iterator();
-        
-        String prev = null;
-        String curr;
-        
-        List<KeyMapModel> kmmList = new ArrayList<KeyMapModel>();
-        KeyMapModel kmm = new KeyMapModel();
-        while(itRes.hasNext()) {
-            KeyMapDao obj = (KeyMapDao)itRes.next();
-            curr = obj.getAccessCode();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
             
-            if(prev == null || !curr.equals(prev)) {
-                kmm = new KeyMapModel(); 
-                kmm.setAccessCode(curr);
-                kmmList.add(kmm);
-            } 
-            kmm.getApiKeys().add(obj.getApiKey());
-            prev = curr;
+            String hql  = "from KeyMapDao K order by K.mbrNo, K.accessCode, K.apiKey";
+            Query query = session.createQuery(hql);
+            
+            List result = query.list();
+            Iterator itRes = result.iterator();
+            
+            String prev = null;
+            String curr;
+            
+            List<KeyMapModel> kmmList = new ArrayList<KeyMapModel>();
+            KeyMapModel kmm = new KeyMapModel();
+            while(itRes.hasNext()) {
+                KeyMapDao obj = (KeyMapDao)itRes.next();
+                curr = obj.getMbrNo();
+                
+                if(prev == null || !curr.equals(prev)) {
+                    kmm = new KeyMapModel();
+                    kmm.setMbrNo(curr);
+                    kmm.setAccessCode(obj.getAccessCode());
+                    kmmList.add(kmm);
+                } 
+                kmm.getApiKeys().add(obj.getApiKey());
+                prev = curr;
+            }
+            tx.commit();
+            return kmmList;
+        } catch(Exception e) {
+            if(tx != null) {
+                tx.rollback();
+            }
+            throw e;
+        } finally {
+            session.close();
         }
+    }
+    public static void removeAllAccessCode(List<String> mbrNoList) throws Exception {
+        Logger logger = LoggerFactory.getLogger(KeyMapDef.class);
+        Session session = HiberUtil.openSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            
+            String hql  = "DELETE FROM KeyMapDao K where K.mbrNo = :mbrNo";
+            Query query = session.createQuery(hql);
+            
+            for(int i = 0 ; i < mbrNoList.size(); i++) {
+                String curr = mbrNoList.get(i);
+                
+                query.setParameter("mbrNo", curr);
+                int result = query.executeUpdate();
+                logger.info("remove mbr no : {}, affected : {}", curr, result);
+            }
+            tx.commit();
+        }catch(Exception e) {
+            if(tx != null) {
+                tx.rollback();
+            }
+            throw e;
+        } finally {
+            session.close();
+        }
+    }
+    public static void insertAll(List<KeyMapDao> keyMapDaoList) throws Exception  {
+        Logger logger = LoggerFactory.getLogger(KeyMapDef.class);
+        Session session = HiberUtil.openSession();
+        Transaction tx = null;
         
-        tx.commit();
-        session.close();
-        return kmmList;
+        try {
+            tx = session.beginTransaction();
+        
+            for(int i = 0; i < keyMapDaoList.size(); i++) {
+                KeyMapDao obj = keyMapDaoList.get(i);
+                session.save(obj);
+                logger.info("save : mbr no : {}, access code : {}, api key : {}", 
+                            new Object[]{obj.getMbrNo(), obj.getAccessCode(), obj.getApiKey()});
+            }
+            tx.commit();
+        } catch(Exception e) {
+            if(tx != null) {
+                tx.rollback();
+            }
+            throw e;
+        } finally {
+            session.close();
+        }
     }
     public List<KeyMapModel> getKeyMapList() {
         return keyMapList;

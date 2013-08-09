@@ -26,10 +26,10 @@ import com.skplanet.rakeflurry.dashboard.DashBoard;
 import com.skplanet.rakeflurry.dashboard.RunningStatus;
 import com.skplanet.rakeflurry.dashboard.WorkStatus;
 import com.skplanet.rakeflurry.db.HiberUtil;
+import com.skplanet.rakeflurry.file.FileManager;
 import com.skplanet.rakeflurry.meta.AppMetricsApi;
-import com.skplanet.rakeflurry.meta.FileManager;
 import com.skplanet.rakeflurry.meta.KeyMapDef;
-import com.skplanet.rakeflurry.service.RakeFlurry;
+import com.skplanet.rakeflurry.service.CollectApi;
 
 // certain api key, access code
 // middle of api key
@@ -48,12 +48,14 @@ public class AppMetrics {
     private static DateFormat timeFormat = new SimpleDateFormat("HHmm");
     
     private CollectParams params = null;
+    private DashBoard dashboard = null;
     
     private AppMetrics() {
         
     }
-    public AppMetrics(CollectParams params) {
+    public AppMetrics(CollectParams params, DashBoard dashboard) {
         this.params = params;
+        this.dashboard = dashboard;
     }
     
     /*
@@ -66,20 +68,20 @@ public class AppMetrics {
      */
     public void collect() throws Exception {
         
-        DashBoard.getInstance().setStartTime(dateFormat.format(new Date()));
-        DashBoard.getInstance().setStartTimeFileCode(timeFormat.format(new Date()));
-        HiberUtil.update(DashBoard.getInstance(), "update starting  dashboard.");
+        dashboard.setStartTime(dateFormat.format(new Date()));
+        dashboard.setStartTimeFileCode(timeFormat.format(new Date()));
+        HiberUtil.update(dashboard, "update starting dashboard.");
         
-        List<AccessCodeSummary> acsList = DashBoard.getInstance().getAccessCodeSummaries();
+        // TODO : multi thread and move this function to outside
+        List<AccessCodeSummary> acsList = dashboard.getAccessCodeSummaries();
         for(int i = 0; i < acsList.size(); ++i) {
         
             AccessCodeSummary acs = acsList.get(i);
             Boolean error = collectAccessCode(acs);
         }
-        // TODO : copy to hdfs
         
-        DashBoard.getInstance().setFinishTime(dateFormat.format(new Date()));
-        HiberUtil.update(DashBoard.getInstance(), "update finishing dashboard.");
+        dashboard.setFinishTime(dateFormat.format(new Date()));
+        HiberUtil.update(dashboard, "update finishing dashboard.");
     }
     
     public Boolean collectAccessCode(AccessCodeSummary acs) throws Exception {
@@ -96,7 +98,9 @@ public class AppMetrics {
             ApiKeySummary aks = aksList.get(i);
              
             error = collectApiKey(acs, aks);
+            
             // TODO: copy to hdfs
+            error = FileManager.getInstance().copyToHdfs(acs, aks, dashboard);
         }
         
         acs.setFinishTime(dateFormat.format(new Date()));
@@ -117,7 +121,7 @@ public class AppMetrics {
         aks.setStartTime(dateFormat.format(new Date()));
         aks.setRunningStatus(RunningStatus.DOWNLOADING);
         
-        String fileName = FileManager.getDataFileName(acs, aks);
+        String fileName = FileManager.getDataFileName(acs, aks, dashboard);
         String fullFileName = FileManager.getInstance().getLocalDataDir() + "/" + fileName;
         
         FileOutputStream fos = new FileOutputStream(fullFileName, false);
@@ -141,6 +145,7 @@ public class AppMetrics {
             } catch (Exception e) {
                 aks.setRunningStatus(RunningStatus.ERROR);
                 acs.setRunningStatus(RunningStatus.ERROR);
+                aks.setErrorMsgLimit(StringUtil.exception2Str(e));
                 error = true;
                 HiberUtil.update(acs, "update error api key.");
                 continue;
@@ -250,4 +255,6 @@ public class AppMetrics {
         logger.info("totalElapsed : {} sec, totalCount : {}, errorCount : {}, totalRetryCount : {}", 
                     new Object[]{(double)totalElapsed/1000, totalCount, errorCount, totalRetryCount});
     }
+    
+    
 }

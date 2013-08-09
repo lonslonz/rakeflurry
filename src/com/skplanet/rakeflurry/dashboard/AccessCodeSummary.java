@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -18,12 +19,14 @@ import javax.persistence.Table;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.skplanet.rakeflurry.db.HiberUtil;
+import com.skplanet.rakeflurry.file.FileManager;
 import com.skplanet.rakeflurry.meta.AppMetricsApi;
-import com.skplanet.rakeflurry.meta.FileManager;
 import com.skplanet.rakeflurry.meta.KeyMapDef;
 
 @Entity
@@ -40,14 +43,16 @@ public class AccessCodeSummary {
     private DashBoard parDashBoard = null;
     private Integer totalCount = 0;
     private String accessCode = null;
+    private String mbrNo = null;
     private String startTime = null;
     private String finishTime = null;
     private RunningStatus runningStatus = RunningStatus.STANDBY;
     private String sourceUri = null;
     private String updateTime = null;   
     
-    public void init(String accessCode, List<String> apiKeyList, DashBoard parent) {
+    public void init(String accessCode, String mbrNo, List<String> apiKeyList, DashBoard parent) {
         this.accessCode = accessCode;
+        this.mbrNo = mbrNo;
         
         int count = apiKeyList.size();
         
@@ -60,6 +65,7 @@ public class AccessCodeSummary {
         }
         totalCount = apiKeySummaries.size();
         parDashBoard = parent;
+        sourceUri = FileManager.getInstance().getStrFullDestUri();
         logger.info("accessCodeSummary initialized. total {} api key.", totalCount);
     }
     
@@ -97,7 +103,8 @@ public class AccessCodeSummary {
     public void setParDashBoard(DashBoard parDashBoard) {
         this.parDashBoard = parDashBoard;
     }
-    @OneToMany( cascade = CascadeType.ALL, mappedBy="parAccessCodeSummary")
+    @OneToMany( cascade = CascadeType.ALL, mappedBy="parAccessCodeSummary", fetch=FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     public List<ApiKeySummary> getApiKeySummaries() {
         return apiKeySummaries;
     }
@@ -118,6 +125,16 @@ public class AccessCodeSummary {
     public void setAccessCode(String accessCode) {
         this.accessCode = accessCode;
     }
+    
+    @Column(name="mbr_no")
+    public String getMbrNo() {
+        return mbrNo;
+    }
+
+    public void setMbrNo(String mbrNo) {
+        this.mbrNo = mbrNo;
+    }
+
     @Column(name="start_time")
     public String getStartTime() {
         return startTime;

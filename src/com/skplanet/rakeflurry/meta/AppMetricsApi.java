@@ -14,7 +14,7 @@ import com.skplanet.rakeflurry.db.AppMetricsDao;
 import com.skplanet.rakeflurry.db.HiberUtil;
 import com.skplanet.rakeflurry.db.KeyMapDao;
 import com.skplanet.rakeflurry.model.KeyMapModel;
-import com.skplanet.rakeflurry.service.RakeFlurry;
+import com.skplanet.rakeflurry.service.CollectApi;
 
 public class AppMetricsApi {  
     private List<String> apiList = new ArrayList<String>();

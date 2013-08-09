@@ -20,63 +20,52 @@ import com.skplanet.cask.util.StringUtil;
 import com.skplanet.rakeflurry.collector.UserManager;
 import com.skplanet.rakeflurry.db.HiberUtil;
 import com.skplanet.rakeflurry.db.KeyMapDao;
+import com.skplanet.rakeflurry.meta.KeyMapDef;
 import com.skplanet.rakeflurry.model.KeyMapModel;
 
 public class OverwriteKeyMap implements SimpleService {
     private Logger logger = LoggerFactory.getLogger(OverwriteKeyMap.class);
     
-    /*
-     * [
-    {
-        "accessCode": "JMCZPBCMJW6SXKPH8ZRG",
-        "apiKeys": [
-            "P2THW59FVVK9JGKR6BKQ",
-            "Q9MQ6PRS5D6DC2SHJWFX"
-        ]
-    },
-    {
-        "accessCode": "JMCZPBCMJW6SXKPH8ZRG111",
-        "apiKeys": [
-            "P2THW59FVVK9JGKR6BKQ",
-            "P2THW59FVVK9JGKR6BKQ"
-        ]
-    }
-]
-     * 
-     */
+    
+
     @Override
     public void handle(SimpleParams request, SimpleParams response, ServiceRuntimeInfo runtimeInfo) throws Exception {
-        
+        Boolean deleteOnly = false;    
         logger.info("start overwrite keymap : {} ", request.getParams());
         if(!UserManager.validate(request.get("id"), request.get("password"))) {
             throw new Exception("id or password not valid.");
         }
         
+        if(request.get("deleteOnly") != null) {
+            deleteOnly = (Boolean)request.get("deleteOnly");
+        }
+        
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
-            Map<String, Object> data = request.getParams();
-            
             ObjectMapper mapper = new ObjectMapper();
             List keyMapList = mapper.convertValue(request.get("keymap"), List.class);
             
             Iterator it = keyMapList.iterator();
-            List<KeyMapDao> keyMapSourceList = new ArrayList<KeyMapDao>();
-            List<String> accessCodeList = new ArrayList<String>();
+            List<KeyMapDao> keyMapDaoList = new ArrayList<KeyMapDao>();
+            List<String> mbrNoList = new ArrayList<String>();
             while(it.hasNext()) {
                 KeyMapModel kmm = mapper.convertValue(it.next(), KeyMapModel.class);
                 
                 List<String> apiKeyList = (List<String>)kmm.getApiKeys();           
                 for(int i = 0; i < apiKeyList.size(); i++) {
                     KeyMapDao kms  = new KeyMapDao();
+                    kms.setMbrNo(kmm.getMbrNo());
                     kms.setAccessCode(kmm.getAccessCode());
                     kms.setApiKey(apiKeyList.get(i));   
-                    keyMapSourceList.add(kms);
+                    keyMapDaoList.add(kms);
                 }
-                accessCodeList.add(kmm.getAccessCode());
+                mbrNoList.add(kmm.getMbrNo());
             }
             
-            removeAllAccessCode(accessCodeList);
-            insertAll(keyMapSourceList);
+            KeyMapDef.removeAllAccessCode(mbrNoList);
+            if(!deleteOnly) {
+                KeyMapDef.insertAll(keyMapDaoList);
+            }
             
             resultMap.put("returnCode",  1);
             resultMap.put("returnDesc",  "success");
@@ -85,50 +74,12 @@ public class OverwriteKeyMap implements SimpleService {
             resultMap.put("returnDesc",  "fail");
             resultMap.put("message", e.getMessage());
             logger.error(StringUtil.exception2Str(e));
+            throw e;
         } finally {
             response.setParams(resultMap);
             logger.info("complete overwrite key map : {} ", response.getParams());
         }
     }
     
-    public void removeAllAccessCode(List<String> accessCodeList) throws Exception {
-        
-        Session session = HiberUtil.openSession();
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            
-            String hql  = "DELETE FROM KeyMapDao K where K.accessCode = :accessCode";
-            Query query = session.createQuery(hql);
-            
-            for(int i = 0 ; i < accessCodeList.size(); i++) {
-                String curr = accessCodeList.get(i);
-                
-                query.setParameter("accessCode", curr);
-                int result = query.executeUpdate();
-                logger.info("remove access code : {}, affected : {}", curr, result);
-            }
-            tx.commit();
-        }catch(Exception e) {
-            if(tx != null) {
-                tx.rollback();
-            }
-            throw e;
-        } finally {
-            session.close();
-        }
-    }
-    public void insertAll(List<KeyMapDao> keyMapSourceList) {
-        Session session = HiberUtil.openSession();
-        Transaction tx = session.beginTransaction();
-        
-        for(int i = 0; i < keyMapSourceList.size(); i++) {
-            KeyMapDao obj = keyMapSourceList.get(i);
-            session.save(obj);
-            logger.info("save : access code : {}, api key : {}", obj.getAccessCode(), obj.getApiKey());
-        }
-        tx.commit();
-        session.flush();
-        session.close();
-    }
+    
 }

@@ -4,9 +4,13 @@
     <server name="localhost" port="8100" contextPath="/rakeflurry" maxThreads="512" staticErrorRedirect="/error.jsp"/>
     <services>
         <service url="/collect" 
-                 class="com.skplanet.rakeflurry.service.RakeFlurry" 
+                 class="com.skplanet.rakeflurry.service.CollectApi" 
                  exec="request" 
-                 method="post"/> 
+                 method="post"/>
+        <service url="/collect/show" 
+                 class="com.skplanet.rakeflurry.service.ShowJobs" 
+                 exec="request" 
+                 method="get"/>
         <service url="/keymap/show" 
                  class="com.skplanet.rakeflurry.service.ShowKeyMap" 
                  exec="request" 
@@ -42,8 +46,10 @@
     <properties>
         <property key = "saveRuntimeIntoDb" value = "false"/>
         <property key = "runtimeDb" value = "caskRuntime"/>
-        <property key = "dataDir" value = "/userdata/cask_home/rakeflurry/data"/>
-        <property key = "apiCallTimeInterval" value = "1200"/>        
+        <property key = "localDataDir" value = "/userdata/cask_home/rakeflurry/data"/>
+        <property key = "hdfsDestUri" value = "hdfs://1.234.62.204:8020/data_test/rakeflurry/daily"/>
+        <property key = "hdfsChmod" value = "0777"/>
+        <property key = "apiCallTimeInterval" value = "1200"/>
         <property key = "id" value = "lons"/>
         <property key = "password" value = "dlwhdals"/>
     </properties>
