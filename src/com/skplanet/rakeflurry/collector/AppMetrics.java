@@ -191,7 +191,8 @@ public class AppMetrics {
                 
                 logger.info("url : {}",  url);
                 result = HttpRequest.sendHttpGet(url);
-                logger.info("result : {}", result);
+                logger.info("result length : {}", result.length());
+                logger.debug("result : {}", result);
              
                 elapsed = System.currentTimeMillis() - start;
                   

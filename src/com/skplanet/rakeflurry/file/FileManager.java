@@ -147,7 +147,7 @@ public class FileManager {
         return String.format(fileFormat, 
                              acs.getMbrNo(), 
                              aks.getApiKey(), 
-                             dashboard.getStartTimeFileCode());
+                             dashboard.getDashboardId());
     }
     public String getLocalDataDir() {
         return localDataDir;
