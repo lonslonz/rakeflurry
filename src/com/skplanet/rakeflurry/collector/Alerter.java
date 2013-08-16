@@ -72,7 +72,7 @@ public class Alerter {
         ObjectMapper mapper = new ObjectMapper();
         String content = mapper.writeValueAsString(mailMap);
         String result = HttpUtil.sendHttpPut(serverUrl, content);
-        logger.info("send error msg. serverUrl : {}, content : {}, result : {}", new Object[]{serverUrl, content, result});
+        logger.info("send mail msg. serverUrl : {}, content : {}, result : {}", new Object[]{serverUrl, content, result});
     }
     
     public void errorApiKey(AccessCodeSummary acs, ApiKeySummary aks) throws Exception {

@@ -52,6 +52,10 @@
         <property key = "apiCallTimeInterval" value = "1200"/>
         <property key = "id" value = "lons"/>
         <property key = "password" value = "dlwhdals"/>
+        
+        <property key = "mailSender" value = "lonslonz@daum.net"/>
+        <property key = "mailRcpt" value = "rakeflurry@sk.com"/>
+        <property key = "mailServerUrl" value = "http://1.234.62.198:8200/mail/sendpost"/>
     </properties>
 
 </configuration>
