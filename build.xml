@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="rakeflurry" default="package" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="rakeflurry" default="tar" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 	<property name="conf.dir" value="conf"/>
 	<property name="lib.dir" value="lib"/>
 	<property name="testlib.dir" value="testlib"/>
@@ -8,13 +8,13 @@
 	<property name="src.dir" value="src"/>
 	<property name="web.dir" value="web"/>
 	<property name="logs.dir" value="logs"/>
-	<property name="dist.dir" value="target"/>
 	<property name="classes.dir" value="classes"/>
 	<property name="release.txt" value="RELEASE_NOTES.txt"/>
 	<property name="test.dir" value="test"/>
 	<property name="report.dir" value="report"/>
 	
 	<property file="${src.dir}/version.properties"/>
+	<property name="version" value="${VERSION}"/>
 	<property name="dist.dir" value="${ant.project.name}-${version}"/>
 	<property name="jar.name" value="${ant.project.name}-${version}.jar"/>
 <!--
