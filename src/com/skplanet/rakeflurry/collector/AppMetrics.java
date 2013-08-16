@@ -58,32 +58,7 @@ public class AppMetrics {
         this.dashboard = dashboard;
     }
     
-    /*
-     * for(access code)
-     *    set dashboard stat
-     *    for(api key)
-     *        set access code stat
-     *        for(api)
-     *            set api code stat
-     */
-    public void collect() throws Exception {
-        
-        dashboard.setStartTime(dateFormat.format(new Date()));
-        dashboard.setStartTimeFileCode(timeFormat.format(new Date()));
-        HiberUtil.update(dashboard, "update starting dashboard.");
-        
-        // TODO : multi thread and move this function to outside
-        List<AccessCodeSummary> acsList = dashboard.getAccessCodeSummaries();
-        for(int i = 0; i < acsList.size(); ++i) {
-        
-            AccessCodeSummary acs = acsList.get(i);
-            Boolean error = collectAccessCode(acs);
-        }
-        
-        dashboard.setFinishTime(dateFormat.format(new Date()));
-        HiberUtil.update(dashboard, "update finishing dashboard.");
-    }
-    
+
     public Boolean collectAccessCode(AccessCodeSummary acs) throws Exception {
         
         acs.setStartTime(dateFormat.format(new Date()));
@@ -93,18 +68,29 @@ public class AppMetrics {
         List<ApiKeySummary> aksList = acs.getApiKeySummaries();
         
         Boolean error = false;
+        Boolean errorDetected = false;
         for(int i = 0; i < aksList.size(); ++i) {
             
             ApiKeySummary aks = aksList.get(i);
              
             error = collectApiKey(acs, aks);
-            
-            // TODO: copy to hdfs
+            if(error) {
+                errorDetected = true;
+                Alerter alerter = new Alerter();
+                alerter.errorApiKey(acs, aks); 
+            }
             error = FileManager.getInstance().copyToHdfs(acs, aks, dashboard);
+            if(error) {
+                errorDetected = true;
+                Alerter alerter = new Alerter();
+                alerter.errorHdfsCopy(acs, aks);
+            }
         }
         
         acs.setFinishTime(dateFormat.format(new Date()));
-        if(!error) {
+        if(errorDetected) {
+            acs.setRunningStatus(RunningStatus.ERROR);
+        } else {
             acs.setRunningStatus(RunningStatus.COMPLETE);
         }
         logElapsed();
@@ -129,12 +115,13 @@ public class AppMetrics {
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
         aks.setFileName(fileName);
         
+        ApiSummary as = null;
         for(int i = 0; i < apiList.size(); i++) {
             try {
                 logger.info("try api, access code : {}, api key : {}, api : {}",  
                             new Object[]{acs.getAccessCode(), aks.getApiKey(), apiList.get(i)});
                 
-                ApiSummary as = new ApiSummary();
+                as = new ApiSummary();
                 as.init(apiList.get(i), aks);
                 aks.getApiSummaries().add(as);
                 HiberUtil.update(aks, "update starting api key.");
@@ -162,15 +149,11 @@ public class AppMetrics {
         return error;
     }
     
-    
-    
-    // error test
-    // normal error (invalid app key)
-    // html error ( 1 sec )
     public String requestApiWithRetry(AccessCodeSummary acs, ApiKeySummary aks, ApiSummary as) throws Exception {
         int retryCount = 0;
         String result = null;
         String url = null;
+        int retryMax = Integer.parseInt(ConfigReader.getInstance().getServerConfig().getPropValue("retryMax"));
         
         as.setStartTime(dateFormat.format(new Date()));
         as.setRunningStatus(RunningStatus.DOWNLOADING);
@@ -236,11 +219,12 @@ public class AppMetrics {
                 ++totalRetryCount;
                 as.setRetryCount(retryCount);
                 
-                if(retryCount > 3) {
+                if(retryCount > retryMax) {
                     as.setRunningStatus(RunningStatus.ERROR);
                     as.setFinishTime(dateFormat.format(new Date()));
                     HiberUtil.update(as, "update error api.");
                     ++errorCount;
+               
                     throw ex;
                 } else {
                     logger.error("retry. sleep {} msec", SLEEP_TIME_MSEC);

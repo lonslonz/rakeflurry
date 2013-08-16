@@ -24,13 +24,17 @@
     <dependencies>
     	<dependency org="com.skplanet" name="cask" rev="latest.integration" transitive="true"/>
     
-    	<dependency org="org.hibernate" name="hibernate-core" rev="4.2.3.Final" transitive="true" />
+    	
     	<dependency org="org.apache.hadoop" name="hadoop-hdfs" rev="2.0.0-alpha" transitive="false"/>
     	<dependency org="org.apache.hadoop" name="hadoop-annotations" rev="2.0.0-alpha" transitive="false"/>
         <dependency org="org.apache.hadoop" name="hadoop-common" rev="2.0.0-alpha" transitive="false"/>
         <dependency org="com.google.guava" name="guava" rev="14.0.1" transitive="true"/>
         <dependency org="org.apache.hadoop" name="hadoop-auth" rev="2.0.0-alpha" transitive="false"/>
-          <dependency org="com.google.protobuf" name="protobuf-java" rev="2.4.0a" transitive="true"/> 
+        <dependency org="com.google.protobuf" name="protobuf-java" rev="2.4.0a" transitive="true"/> 
+        <dependency org="org.hibernate" name="hibernate-core" rev="4.2.3.Final" transitive="true" />
+        <dependency org="org.hibernate" name="hibernate-c3p0" rev="4.2.3.Final" transitive="false"/>
+        <dependency org="com.mchange" name="c3p0" rev="0.9.2.1" transitive="false"/>
+        <dependency org="com.mchange" name="mchange-commons-java" rev="0.2.6" transitive="false"/>
             
             
     <!--         

@@ -15,7 +15,7 @@
 	<property name="report.dir" value="report"/>
 	
 	<property file="${src.dir}/version.properties"/>
-	<property name="version" value="${VERSION}"/>
+	<property name="dist.dir" value="${ant.project.name}-${version}"/>
 	<property name="jar.name" value="${ant.project.name}-${version}.jar"/>
 <!--
 	<property environment="env"/>

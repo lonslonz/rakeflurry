@@ -142,7 +142,7 @@ public class ApiKeySummary {
     }
     public void setErrorMsgLimit(String errorMsg) {
         if(errorMsg != null) {
-            setErrorMsg(errorMsg.substring(1, 2046));
+            setErrorMsg(errorMsg.substring(0, 2045));
         } else {
             setErrorMsg(errorMsg);
         }

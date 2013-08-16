@@ -59,5 +59,8 @@
 	<classpathentry kind="lib" path="lib/guava-14.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/hadoop-auth-2.0.0-alpha.jar"/>
 	<classpathentry kind="lib" path="lib/protobuf-java-2.4.0a.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate-c3p0-4.2.3.Final.jar"/>
+	<classpathentry kind="lib" path="lib/c3p0-0.9.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/mchange-commons-java-0.2.6.jar"/>
 	<classpathentry kind="output" path="output"/>
 </classpath>

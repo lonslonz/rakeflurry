@@ -46,21 +46,12 @@
     <properties>
         <property key = "saveRuntimeIntoDb" value = "false"/>
         <property key = "runtimeDb" value = "caskRuntime"/>
-        <property key = "retryMax" value = "5"/>
         <property key = "localDataDir" value = "/userdata/cask_home/rakeflurry/data"/>
         <property key = "hdfsDestUri" value = "hdfs://1.234.62.204:8020/data_test/rakeflurry_win/daily"/>
-        <!--  
-        <property key = "hdfsDestUri" value = "hdfs://1.234.62.204:8020/data_test/rakeflurry/daily"/>
-        -->
         <property key = "hdfsChmod" value = "0775"/>
         <property key = "apiCallTimeInterval" value = "1200"/>
         <property key = "id" value = "lons"/>
         <property key = "password" value = "dlwhdals"/>
-        
-        <property key = "mailSender" value = "lonslonz@daum.net"/>
-        <property key = "mailRcpt" value = "rakeflurry@sk.com"/>
-        <property key = "mailServerUrl" value = "http://1.234.62.198:8200/mail/sendpost"/>
-        
     </properties>
 
 </configuration>

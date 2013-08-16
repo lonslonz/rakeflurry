@@ -19,6 +19,7 @@ import com.skplanet.cask.util.StringUtil;
 import com.skplanet.rakeflurry.collector.AppMetrics;
 import com.skplanet.rakeflurry.collector.CollectParams;
 import com.skplanet.rakeflurry.collector.Collector;
+import com.skplanet.rakeflurry.collector.Alerter;
 import com.skplanet.rakeflurry.collector.UserManager;
 import com.skplanet.rakeflurry.dashboard.DashBoard;
 import com.skplanet.rakeflurry.file.FileManager;
@@ -27,12 +28,9 @@ import com.skplanet.rakeflurry.meta.AppMetricsApi;
 import com.skplanet.rakeflurry.meta.KeyMapDef;
 
 //TODO :
-// api caller
-// save file
-// copy hadoop
-// 
-// start from middle
-// restart
+// 1. error task retry automatics
+// 2. only some task execute
+// 3. multi-thread
 
 
 // 
@@ -89,6 +87,8 @@ public class CollectApi implements SimpleService {
             dashboard.init(KeyMapDef.getInstance());
             dashboard.saveAllIntoDb();
             
+
+            
             Collector collector = new Collector(params, dashboard);
             collector.collect();
             
@@ -96,12 +96,20 @@ public class CollectApi implements SimpleService {
             resultMap.put("results",  dashboard);
             
             response.setParams(resultMap);
+            
+            Alerter alerter = new Alerter();
+            alerter.finishCollectApiService(dashboard);
+            
             logger.info("complete collect service : {} ", response.getParams());
         } catch(Exception e) {
             resultMap.put("returnCode",  -1);
             resultMap.put("returnDesc",  "fail");
-            resultMap.put("message", e.getMessage());
+            resultMap.put("message", e.getMessage()); 
             logger.error(StringUtil.exception2Str(e));
+            
+            Alerter alerter = new Alerter();
+            alerter.errorCollectApiService(e.getMessage());
+            
             throw e;
         }
         finally {

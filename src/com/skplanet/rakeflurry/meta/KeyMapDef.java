@@ -80,16 +80,19 @@ public class KeyMapDef {
         try {
             tx = session.beginTransaction();
             
-            String hql  = "DELETE FROM KeyMapDao K where K.mbrNo = :mbrNo";
+            //String hql  = "DELETE FROM KeyMapDao K where K.mbrNo = :mbrNo";
+            String hql  = "DELETE FROM KeyMapDao K";
             Query query = session.createQuery(hql);
+            int result = query.executeUpdate();
+            logger.info("remove all keymap table, affected : {}", result);
             
-            for(int i = 0 ; i < mbrNoList.size(); i++) {
-                String curr = mbrNoList.get(i);
-                
-                query.setParameter("mbrNo", curr);
-                int result = query.executeUpdate();
-                logger.info("remove mbr no : {}, affected : {}", curr, result);
-            }
+//            for(int i = 0 ; i < mbrNoList.size(); i++) {
+//                String curr = mbrNoList.get(i);
+//                
+//                //query.setParameter("mbrNo", curr);
+//                int result = query.executeUpdate();
+//                logger.info("remove mbr no : {}, affected : {}", curr, result);
+//            }
             tx.commit();
         }catch(Exception e) {
             if(tx != null) {

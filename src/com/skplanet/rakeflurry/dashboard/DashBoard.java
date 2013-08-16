@@ -42,7 +42,6 @@ public class DashBoard {
     private Integer totalCount = 0;
     private String startTime = null;
     private String finishTime = null;
-    private String startTimeFileCode = null;
     
     @JsonIgnore
     private String updateTime = null;
@@ -211,6 +210,14 @@ public class DashBoard {
         }
         return null;
     }
+    public boolean hasError() {
+        for(int i = 0; i < accessCodeSummaries.size(); ++i) {
+            if(accessCodeSummaries.get(i).getRunningStatus() == RunningStatus.ERROR) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     @Id @GeneratedValue
     @Column(name="dashboard_id")
@@ -246,14 +253,6 @@ public class DashBoard {
 
     public void setFinishTime(String finishTime) {
         this.finishTime = finishTime;
-    }
-    @Column(name="start_time_file_code")
-    public String getStartTimeFileCode() {
-        return startTimeFileCode;
-    }
-
-    public void setStartTimeFileCode(String startTimeFileCode) {
-        this.startTimeFileCode = startTimeFileCode;
     }
 
     

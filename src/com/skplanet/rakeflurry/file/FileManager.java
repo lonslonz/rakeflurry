@@ -96,6 +96,8 @@ public class FileManager {
             }
             sb.append(curr);
             sb.append("/");
+            logger.info("will chmod : destUri : {}, dir : {}, perm : {}", 
+                    new Object[]{destUri, sb, realPerm});
             FileSystemHelper.chmod(destUri, sb.toString(), realPerm);
             logger.info("chmod : destUri : {}, dir : {}, perm : {}", 
                         new Object[]{destUri, sb, realPerm});

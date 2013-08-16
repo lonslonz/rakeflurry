@@ -31,15 +31,22 @@
     <session-factory>
 
         <!-- Database connection settings -->
+        <property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
         <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-        <property name="connection.url">jdbc:mysql://1.234.90.53/rakeflurry</property>
+        <property name="connection.url">jdbc:mysql://1.234.90.53/rakeflurry?autoReconnect=true</property>
         <property name="connection.username">lons</property>
         <property name="connection.password">dlwhdals</property>
-        
         <property name="hibernate.connection.autocommit ">false</property>
 
+        <property name="hibernate.c3p0.min_size">10</property>
+        <property name="hibernate.c3p0.max_size">50</property>
+        <property name="hibernate.c3p0.idle_test_period">100</property>
+        <property name="hibernate.c3p0.preferredTestQuery">select 1 from tb_keymap</property>
+        
         <!-- JDBC connection pool (use the built-in) -->
+        <!-- 
         <property name="connection.pool_size">20</property>
+        -->
 
         <!-- SQL dialect -->
         <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
@@ -62,6 +69,7 @@
         <mapping class="com.skplanet.rakeflurry.dashboard.AccessCodeSummary"/>
         <mapping class="com.skplanet.rakeflurry.dashboard.ApiKeySummary"/>
         <mapping class="com.skplanet.rakeflurry.dashboard.ApiSummary"/>
+        
 
     </session-factory>
 

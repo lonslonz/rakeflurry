@@ -17,6 +17,7 @@ import com.skplanet.cask.container.ServiceRuntimeInfo;
 import com.skplanet.cask.container.model.SimpleParams;
 import com.skplanet.cask.container.service.SimpleService;
 import com.skplanet.cask.util.StringUtil;
+import com.skplanet.rakeflurry.collector.Alerter;
 import com.skplanet.rakeflurry.collector.UserManager;
 import com.skplanet.rakeflurry.db.HiberUtil;
 import com.skplanet.rakeflurry.db.KeyMapDao;
@@ -74,6 +75,10 @@ public class OverwriteKeyMap implements SimpleService {
             resultMap.put("returnDesc",  "fail");
             resultMap.put("message", e.getMessage());
             logger.error(StringUtil.exception2Str(e));
+            
+            Alerter alerter = new Alerter();
+            alerter.errorOverwriteKeyMapService(e.getMessage());
+            
             throw e;
         } finally {
             response.setParams(resultMap);
