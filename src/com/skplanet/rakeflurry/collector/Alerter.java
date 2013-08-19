@@ -134,7 +134,7 @@ public class Alerter {
                             "end time : %s \n" +
                             "elapsed : %f sec \n" +
                             "access code count : %s \n" + 
-                            "result : %b \n", 
+                            "result : %s \n", 
                             getCommonMsg(), dashboard.getDashboardId(), dashboard.getStartTime(), dashboard.getFinishTime(),
                             elapsed, dashboard.getTotalCount(), hasError ? "Fail" : "Success");
             
