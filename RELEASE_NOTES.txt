@@ -7,6 +7,7 @@
 - remove all keymap table when overwriting
 - change conn pool to c3p0 for validation check.
 - alert when job failed and finished.
+- divide config to default and real mode.
 
 0.4.0
 - PK changed : accessCode to mbrNo

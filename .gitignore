@@ -2,6 +2,16 @@
 ## Eclipse
 #################
 
+confmode
+target
+classes
+lib
+conf/server.xml
+conf/hibernate.cfg.xml
+rakeflurry-*
+temp
+
+
 *.pydevproject
 .metadata
 tmp/

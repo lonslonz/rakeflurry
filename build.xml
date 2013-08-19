@@ -2,6 +2,7 @@
 
 <project name="rakeflurry" default="tar" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 	<property name="conf.dir" value="conf"/>
+	<property name="confmode.dir" value="confmode"/>
 	<property name="lib.dir" value="lib"/>
 	<property name="testlib.dir" value="testlib"/>
 	<property name="bin.dir" value="bin"/>
@@ -38,6 +39,13 @@
 		<mkdir dir="${dist.dir}"/>
 	</target>
 	
+	
+	<target name="conf">
+	    <fail unless="mode" message="specify -Dmode=[dev,real]"/>
+	    <copy file="${confmode.dir}/server.${mode}.xml" tofile="${conf.dir}/server.xml" overwrite="true"/>
+	    <copy file="${confmode.dir}/hibernate.cfg.${mode}.xml" tofile="${conf.dir}/hibernate.cfg.xml" overwrite="true"/>
+    </target>
+    
 	<target name="compile" depends="clean, init">
 		<javac debug="true" srcdir="${src.dir}" destdir="${classes.dir}" 
 				classpathref="libraries" includeantruntime="false" />

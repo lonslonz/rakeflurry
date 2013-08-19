@@ -33,9 +33,9 @@
         <!-- Database connection settings -->
         <property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
         <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-        <property name="connection.url">jdbc:mysql://1.234.90.53/rakeflurry?autoReconnect=true</property>
-        <property name="connection.username">lons</property>
-        <property name="connection.password">dlwhdals</property>
+        <property name="connection.url">jdbc:mysql://mysqlserver/rakeflurry?autoReconnect=true</property>
+        <property name="connection.username">id</property>
+        <property name="connection.password">pass</property>
         <property name="hibernate.connection.autocommit ">false</property>
 
         <property name="hibernate.c3p0.min_size">10</property>

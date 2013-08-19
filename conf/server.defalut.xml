@@ -46,20 +46,26 @@
     <properties>
         <property key = "saveRuntimeIntoDb" value = "false"/>
         <property key = "runtimeDb" value = "caskRuntime"/>
+        
+        <!-- when calling flurry api failed -->
         <property key = "retryMax" value = "5"/>
+        <!-- local temp dir -->
         <property key = "localDataDir" value = "/userdata/cask_home/rakeflurry/data"/>
-        <property key = "hdfsDestUri" value = "hdfs://1.234.62.204:8020/data_test/rakeflurry_win/daily"/>
-        <!--  
-        <property key = "hdfsDestUri" value = "hdfs://1.234.62.204:8020/data_test/rakeflurry/daily"/>
-        -->
+        <!-- hdfs destination dir -->
+        <property key = "hdfsDestUri" value = "hdfs://hadoopserver:8020/dir"/>
+        
+        <!--  hdfs destination dir chmod -->
         <property key = "hdfsChmod" value = "0775"/>
         <property key = "apiCallTimeInterval" value = "1200"/>
-        <property key = "id" value = "lons"/>
-        <property key = "password" value = "dlwhdals"/>
         
-        <property key = "mailSender" value = "lonslonz@daum.net"/>
-        <property key = "mailRcpt" value = "rakeflurry@sk.com"/>
-        <property key = "mailServerUrl" value = "http://1.234.62.198:8200/mail/sendpost"/>
+        <!-- to authentify update -->
+        <property key = "id" value = "id"/>
+        <property key = "password" value = "pass"/>
+        
+        <!-- PrimeMailer config -->
+        <property key = "mailSender" value = "sender@mail.com"/>
+        <property key = "mailRcpt" value = "rcpt@mail.com"/>
+        <property key = "mailServerUrl" value = "http://primemailer:8200/mail/sendpost"/>
         
     </properties>
 

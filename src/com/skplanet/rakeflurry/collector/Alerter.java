@@ -64,6 +64,14 @@ public class Alerter {
         return common;
     }
     private void sendHttp() throws Exception {
+        
+        if(from == null || to == null || serverUrl == null) {
+            logger.error(
+                    "PrimeMailer config not valid. from : {}, to : {}, serverUrl : {}",
+                    new Object[]{from, to, serverUrl});
+            return;
+        }
+        
         Map<String, String> mailMap = new LinkedHashMap<String, String>(); 
         mailMap.put("from", from);
         mailMap.put("to", to);
@@ -117,7 +125,7 @@ public class Alerter {
             
             boolean hasError = dashboard.hasError();
             setSubject("Job Reporting", "Collecting api service finished.");
-            this.subject += " error : " + hasError;
+            this.subject += hasError ? "Fail" : "Success";
             
             this.message = String.format(
                             "%s" + 
@@ -126,9 +134,9 @@ public class Alerter {
                             "end time : %s \n" +
                             "elapsed : %f sec \n" +
                             "access code count : %s \n" + 
-                            "error : %b \n", 
+                            "result : %b \n", 
                             getCommonMsg(), dashboard.getDashboardId(), dashboard.getStartTime(), dashboard.getFinishTime(),
-                            elapsed, dashboard.getTotalCount(), hasError);
+                            elapsed, dashboard.getTotalCount(), hasError ? "Fail" : "Success");
             
             sendHttp();
         } catch (Exception e) {
