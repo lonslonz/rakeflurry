@@ -41,6 +41,9 @@ public class Collector {
         AppMetrics appMetrics = new AppMetrics(params, dashboard);
         
         dashboard.setStartTime(dateFormat.format(new Date()));
+        dashboard.setCallStartDay(params.getStartDay());
+        dashboard.setCallEndDay(params.getEndDay());
+        
         HiberUtil.update(dashboard, "update starting dashboard.");
         
         // TODO : multi thread and move this function to outside
@@ -54,7 +57,28 @@ public class Collector {
         dashboard.setFinishTime(dateFormat.format(new Date()));
         HiberUtil.update(dashboard, "update finishing dashboard.");
     }
-    
+    public void recover() throws Exception {
+        
+        AppMetrics appMetrics = new AppMetrics(params, dashboard);
+        
+        dashboard.setDashboardId(dashboard.getDashboardId() + 1);
+        dashboard.setStartTime(dateFormat.format(new Date()));
+        dashboard.setCallStartDay(params.getStartDay());
+        dashboard.setCallEndDay(params.getEndDay());
+        HiberUtil.update(dashboard, "update starting dashboard.");
+        
+        // TODO : multi thread and move this function to outside
+        List<AccessCodeSummary> acsList = dashboard.getAccessCodeSummaries();
+        for(int i = 0; i < acsList.size(); ++i) {
+        
+            AccessCodeSummary acs = acsList.get(i);
+            Boolean error = appMetrics.collectAccessCode(acs);
+        }
+        
+        dashboard.setFinishTime(dateFormat.format(new Date()));
+        HiberUtil.update(dashboard, "update finishing dashboard.");
+        
+    }
     public CollectParams getParams() {
         return params;
     }

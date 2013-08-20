@@ -1,6 +1,7 @@
 package com.skplanet.rakeflurry.dashboard;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -27,7 +28,7 @@ import com.skplanet.rakeflurry.meta.AppMetricsApi;
 public class ApiKeySummary {
     private String apiKey = null;
     
-    private List<ApiSummary> apiSummaries = new ArrayList<ApiSummary>();    
+    private List<ApiSummary> apiSummaries = new LinkedList<ApiSummary>();    
     private Integer apiKeyId = null;
     @JsonIgnore
     private AccessCodeSummary parAccessCodeSummary = null;

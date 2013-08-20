@@ -101,6 +101,18 @@ public class Alerter {
             logger.error("send http error : {}", StringUtil.exception2Str(e));
         }
     }
+    public void errorRecoverApiService(String msg) throws Exception {
+        try {
+            setSubject("ERROR", "Recorvering Api Service failed.");
+            this.message = String.format(
+                    "%s", 
+                    msg);
+            this.message = getCommonMsg() + this.message;
+            sendHttp();
+        } catch (Exception e) {
+            logger.error("send http error : {}", StringUtil.exception2Str(e));
+        }
+    }
     public void errorOverwriteKeyMapService(String msg) throws Exception {
         try {
             setSubject("ERROR", "Overwriting KeyMap Service failed.");
@@ -113,9 +125,9 @@ public class Alerter {
             logger.error("send http error : {}", StringUtil.exception2Str(e));
         }
     }
-    public void finishCollectApiService(DashBoard dashboard) throws Exception {
+    
+    public void finishCollectApiServiceLow(DashBoard dashboard, String subject) throws Exception {
         try {
-            
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             
             Date start = dateFormat.parse(dashboard.getStartTime());
@@ -124,23 +136,41 @@ public class Alerter {
             float elapsed = (float)(end.getTime() - start.getTime())/1000;
             
             boolean hasError = dashboard.hasError();
-            setSubject("Job Reporting", "Collecting api service finished.");
+            setSubject("Job Reporting", subject);
             this.subject += hasError ? "Fail" : "Success";
             
             this.message = String.format(
                             "%s" + 
                             "dashboard id : %s \n" +
+                            "recover who dashboard id : %s \n" +
+                            "recover me dashboard id : %s \n" +
                             "start time : %s \n" +
                             "end time : %s \n" +
                             "elapsed : %f sec \n" +
                             "access code count : %s \n" + 
                             "result : %s \n", 
-                            getCommonMsg(), dashboard.getDashboardId(), dashboard.getStartTime(), dashboard.getFinishTime(),
-                            elapsed, dashboard.getTotalCount(), hasError ? "Fail" : "Success");
+                            getCommonMsg(), 
+                            dashboard.getDashboardId(), 
+                            dashboard.getRecoverWhoId(), 
+                            dashboard.getRecoverMeId(),
+                            dashboard.getStartTime(), 
+                            dashboard.getFinishTime(),
+                            elapsed, 
+                            dashboard.getTotalCount(), 
+                            hasError ? "Fail" : "Success");
             
             sendHttp();
         } catch (Exception e) {
             logger.error("send http error : {}", StringUtil.exception2Str(e));
         }
+    }
+    public void finishCollectApiService(DashBoard dashboard) throws Exception {
+        finishCollectApiServiceLow(dashboard, "Collecting api service finished.");
+    }
+    public void finishRecoverApiService(DashBoard dashboard) throws Exception {
+        finishCollectApiServiceLow(dashboard, "Recovering api service finished.");
+    }
+    public void finishNoRecoverApiService(DashBoard dashboard) throws Exception {
+        finishCollectApiServiceLow(dashboard, "Recovering api service finished. Nothing executed. No Previous Error.");
     }
 }

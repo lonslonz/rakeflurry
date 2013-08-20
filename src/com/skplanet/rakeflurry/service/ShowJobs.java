@@ -34,20 +34,37 @@ public class ShowJobs implements SimpleService {
             
             String date = request.getString("date");
             String id = request.getString("id");
+            String includeRecover = request.getString("recover");
+            boolean recover = false;
+            if(includeRecover != null) {
+                recover = Boolean.parseBoolean(includeRecover);
+            }
+            String showApi = request.getString("showapi");
+            boolean needShowApi = false;
+            if(showApi != null) {
+                needShowApi = Boolean.parseBoolean(showApi);
+            }
             
+            DashBoard dashboard = null;
+            List<DashBoard> dashboardList = null;
             if(date != null) {
-                List<DashBoard> dashboardList = DashBoard.selectByDate(date);
+                dashboardList = DashBoard.selectByDate(date, recover);
                 resultMap.put("results", dashboardList);
             } else if(id != null) {
-                DashBoard dashboard = DashBoard.selectById(Integer.parseInt(id));
+                dashboard = DashBoard.selectById(Integer.parseInt(id));
                 resultMap.put("results", dashboard);
             }
             else {
-                DashBoard dashboard = DashBoard.selectLastOne();
+                dashboard = DashBoard.selectLastOne(recover);
                 resultMap.put("results", dashboard );
             }
-            
-            
+            if(!needShowApi) {
+                if(date != null) {
+                    removeApi(dashboardList);
+                } else {
+                    removeApi(dashboard);    
+                }
+            }
             
         } catch (Exception e) {
             resultMap.put("returnCode",  -1);
@@ -59,4 +76,15 @@ public class ShowJobs implements SimpleService {
             logger.info("complete show jobs : {} ", response.getParams());
         }
     }
+    public void removeApi(List<DashBoard> dashboardList) {
+        Iterator<DashBoard> it = dashboardList.iterator();
+        while(it.hasNext()) {
+            DashBoard curr = it.next();
+            curr.removeApi();
+        }
+    }
+    public void removeApi(DashBoard dashboard) {
+        dashboard.removeApi();
+    }
+    
 }

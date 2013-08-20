@@ -1,11 +1,7 @@
 package com.skplanet.rakeflurry.service;
 
-import java.net.URI;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -16,38 +12,26 @@ import com.skplanet.cask.container.ServiceRuntimeInfo;
 import com.skplanet.cask.container.model.SimpleParams;
 import com.skplanet.cask.container.service.SimpleService;
 import com.skplanet.cask.util.StringUtil;
-import com.skplanet.rakeflurry.collector.AppMetrics;
 import com.skplanet.rakeflurry.collector.CollectParams;
 import com.skplanet.rakeflurry.collector.Collector;
 import com.skplanet.rakeflurry.collector.Alerter;
 import com.skplanet.rakeflurry.collector.UserManager;
 import com.skplanet.rakeflurry.dashboard.DashBoard;
 import com.skplanet.rakeflurry.file.FileManager;
-import com.skplanet.rakeflurry.file.FileSystemHelper;
 import com.skplanet.rakeflurry.meta.AppMetricsApi;
-import com.skplanet.rakeflurry.meta.KeyMapDef;
+import com.skplanet.rakeflurry.model.KeyMapModel;
 import com.skplanet.rakeflurry.util.Right;
 
-//TODO :
-// 1. error task retry automatics
-// 2. only some task execute
-// 3. multi-thread
 
-
-// 
-// duration : 30
-// accessCodeStartIndex : 0 ~ n-1
-// accessCodeWorkRange : { start : 0, end : n-1 } -- when start : -1 : all
-// apiCodeStartIndex
-
-public class CollectApi implements SimpleService {
+public class RecoverApi implements SimpleService {
     private Logger logger = LoggerFactory.getLogger(CollectApi.class);
 
     
+    // options : { duration = 30, dashboard_id = 1} 
     @Override
     public void handle(SimpleParams request, SimpleParams response, ServiceRuntimeInfo runtimeInfo) throws Exception {
         
-        logger.info("start collect service. {}", request.getParams());
+        logger.info("start recover api  service. {}", request.getParams());
         
         if(!UserManager.validate(request.get("id"), request.get("password"))) {
             throw new Exception("id or password not valid.");
@@ -57,41 +41,63 @@ public class CollectApi implements SimpleService {
             logger.warn("request when execution already exists.");
             throw new Exception("execution already exists");
         }
-            
+        
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
             
-            Map<String, Object> data = request.getParams();
-            Iterator<String> it = data.keySet().iterator();
-            
             ObjectMapper mapper = new ObjectMapper();
             CollectParams params = mapper.convertValue(request.get("options"), CollectParams.class);
-            
             params.init();
             
             FileManager.getInstance().init();
             AppMetricsApi.getInstance().init();
             
-            KeyMapDef keymapDef = new KeyMapDef();
-            keymapDef.init();
+            DashBoard prevDashboard = null;
+            if(params.getDashboardId() != null) {
+                prevDashboard = DashBoard.selectById(params.getDashboardId());
+            } else {
+                if(params.getRecover() != null) {
+                    prevDashboard = DashBoard.selectLastOne(params.getRecover());    
+                } else {
+                    prevDashboard = DashBoard.selectLastOne(true);
+                }
+                
+            }
+            if(prevDashboard == null) {
+                throw new Exception("there is no dashboard. id : " + params.getDashboardId());
+            }
+            List<KeyMapModel> kmmList = prevDashboard.filterFailedKeyMap();
             
-            DashBoard dashboard = new DashBoard();
-            dashboard.init(keymapDef);
-            
-            dashboard.saveAllIntoDb();
-                        
-            Collector collector = new Collector(params, dashboard);
-            collector.collect();
-            
-            //resultMap.put("AccessCodeSummaries",  DashBoard.getInstance().getAccessCodeSummaries());
-            resultMap.put("results",  dashboard);
-            
+            DashBoard recoverDashboard = null;
+            if(kmmList.size() == 0) {
+                logger.info("There is no error case. dashboard id : {}", prevDashboard.getDashboardId());
+                resultMap.put("results",  "no error");
+                
+            } else {
+                recoverDashboard = new DashBoard();
+                recoverDashboard.initWithKeyMapList(kmmList);
+                
+                recoverDashboard.setRecoverWhoId(prevDashboard.getDashboardId());
+                recoverDashboard.saveAllIntoDb();
+                
+                prevDashboard.setRecoverMeId(recoverDashboard.getDashboardId());
+                prevDashboard.update();
+                
+                Collector collector = new Collector(params, recoverDashboard);
+                collector.collect();
+                
+                resultMap.put("results",  recoverDashboard);
+            }
             response.setParams(resultMap);
             
             Alerter alerter = new Alerter();
-            alerter.finishCollectApiService(dashboard);
+            if(kmmList.size() != 0) {
+                alerter.finishRecoverApiService(recoverDashboard);
+            } else {
+                alerter.finishNoRecoverApiService(prevDashboard);
+            }
             
-            logger.info("complete collect service : {} ", response.getParams());
+            logger.info("complete recover api  service : {} ", response.getParams());
         } catch(Exception e) {
             resultMap.put("returnCode",  -1);
             resultMap.put("returnDesc",  "fail");
@@ -107,4 +113,5 @@ public class CollectApi implements SimpleService {
             Right.releaseRight();
         }
     }
+    
 }

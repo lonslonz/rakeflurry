@@ -25,7 +25,6 @@ public class FileManager {
     private static DateFormat dirDateFormat = new SimpleDateFormat("yyyy/MM/dd");
     private static FileManager instance = new FileManager();
     private static String fileFormat = "%s_%s_%s.log";
-    private static DateFormat timeFormat = new SimpleDateFormat("HHmm");
     private URI destUri;
     private String strFullDestUri;
     

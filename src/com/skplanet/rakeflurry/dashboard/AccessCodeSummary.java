@@ -1,6 +1,7 @@
 package com.skplanet.rakeflurry.dashboard;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -36,7 +37,7 @@ public class AccessCodeSummary {
     private Logger logger = LoggerFactory.getLogger(AccessCodeSummary.class);
     
     
-    private List<ApiKeySummary> apiKeySummaries = new ArrayList<ApiKeySummary>();
+    private List<ApiKeySummary> apiKeySummaries = new LinkedList<ApiKeySummary>();
     
     private Integer accessCodeId = null;
     @JsonIgnore

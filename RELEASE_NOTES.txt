@@ -3,6 +3,12 @@
                    Release Notes
 
 --------------------
+
+0.6.0
+- add showapi flag : remove api's detailed result when show jobs.
+- add recovery service : recover previous errored jobs. 
+- add recovery flag : show include recovery jobs, add dashboard's field that means recovery for whom.   
+
 0.5.0
 - remove all keymap table when overwriting
 - change conn pool to c3p0 for validation check.

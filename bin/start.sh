@@ -6,7 +6,7 @@ bin=`cd "$bin"; pwd`
 
 . "$bin"/config.sh
 
-JAVA_OPT="-Xmx500m -Xms100m -XX:+UseConcMarkSweepGC -server -Dfile.encoding=utf-8"
+JAVA_OPT="-Xmx2000m -Xms100m -XX:+UseConcMarkSweepGC -server -Dfile.encoding=utf-8"
 JMX_CONFIG="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8998 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false"
 
 mkdir -p "$TEMP_DIR"

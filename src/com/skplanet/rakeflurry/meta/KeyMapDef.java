@@ -19,19 +19,14 @@ import com.skplanet.rakeflurry.service.OverwriteKeyMap;
 
 public class KeyMapDef {
     private Logger logger = LoggerFactory.getLogger(KeyMapDef.class);
-    private static KeyMapDef instance = new KeyMapDef();
     private List<KeyMapModel> keyMapList = new ArrayList<KeyMapModel>();
     
-    public static KeyMapDef getInstance() {
-        return instance;
-    }
-    // TODO : get from DB
     public void init() throws Exception {
-        
         keyMapList.clear();
         keyMapList = getDataFromDb();
         logger.info("read keymap from db");
     }
+    
     public static List<KeyMapModel> getDataFromDb() throws Exception {
         Session session = HiberUtil.openSession();
         Transaction tx = null;

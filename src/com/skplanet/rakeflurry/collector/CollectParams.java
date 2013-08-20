@@ -26,6 +26,8 @@ public class CollectParams {
        
     private String id;
     private String password;
+    private Integer dashboardId = null;
+    private Boolean recover = null;
     
     public void init() {
         
@@ -100,6 +102,24 @@ public class CollectParams {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public Integer getDashboardId() {
+        return dashboardId;
+    }
+
+    public void setDashboardId(Integer dashboardId) {
+        this.dashboardId = dashboardId;
+    }
+
+    public Boolean getRecover() {
+        return recover;
+    }
+
+    public void setRecover(Boolean recover) {
+        this.recover = recover;
+    }
+
+   
     
     
     
