@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="rakeflurry" default="tar" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="rakeflurry" default="package" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 	<property name="conf.dir" value="conf"/>
 	<property name="confmode.dir" value="confmode"/>
 	<property name="lib.dir" value="lib"/>
@@ -17,12 +17,9 @@
 	<property file="${src.dir}/version.properties"/>
 	<property name="version" value="${VERSION}"/>
 	<property name="dist.dir" value="${ant.project.name}-${version}"/>
-	<property name="jar.name" value="${ant.project.name}-${version}.jar"/>
-<!--
-	<property environment="env"/>
-        <property name="github.repo.local" value="${env.GITHUB_MAVEN_REPO}"/>
--->
-	
+	<property name="jar.file" value="${ant.project.name}-${version}.jar"/>
+    <property name="tar.file" value="${ant.project.name}-${version}.tar.gz"/>
+
 	<path id="libraries">
 		<fileset dir="${lib.dir}">
 			<include name="*.jar"/>
@@ -30,15 +27,17 @@
 	</path>
 	
 	<target name="clean">
-			<delete dir="${classes.dir}"/>
-			<delete dir="${dist.dir}"/>
-		</target>
+		<delete dir="${classes.dir}"/>
+		<delete includeemptydirs="true">
+            <fileset dir="." includes="${ant.project.name}-*"/>
+            <fileset dir="." includes="${ant.project.name}-*/"/>
+        </delete>
+	</target>
 	
 	<target name="init">
 		<mkdir dir="${classes.dir}"/>
 		<mkdir dir="${dist.dir}"/>
 	</target>
-	
 	
 	<target name="conf">
 	    <fail unless="mode" message="specify -Dmode=[dev,real]"/>
@@ -73,10 +72,15 @@
 		<mkdir dir="${dist.dir}/${logs.dir}"/>
 		<mkdir dir="${dist.dir}/${test.dir}"/>
 		<copy file="${release.txt}" todir="${dist.dir}"/>
-		<jar jarfile="${dist.dir}/${bin.dir}/${jar.name}" basedir="${classes.dir}" />
+		<copy file="${release.txt}" tofile="${web.dir}/releasenotes"/>
+		<jar jarfile="${dist.dir}/${bin.dir}/${jar.file}" basedir="${classes.dir}" />
+		<tar compression="gzip" destfile="${tar.file}">
+            <tarfileset dir="${dist.dir}" prefix="${dist.dir}">
+            </tarfileset>
+        </tar>
+		
 	</target>
 	<target name="resolve" description="--> retreive dependencies with ivy">
-            <!-- <ivy:retrieve type="jar" sync="true"/> -->
             <ivy:retrieve type="jar,bundle" sync="true"/>
         </target> 
 	
@@ -93,40 +97,5 @@
         </exec>
     </target>
 	
-    <target name="publish" depends="resolve, package" description="Publish this build into repository">
-        <property name="ivy.local.default.ivy.pattern" value="[organisation]/[module]/[type]s/[artifact]-[revision].[ext]" />
-        <property name="ivy.local.default.artifact.pattern" value="[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"  />
-        <ivy:publish pubrevision="${version}" status="release" resolver="local" overwrite="true" >
-               <artifacts pattern="target/bin/[artifact]-[revision].[ext]"/>
-        </ivy:publish>
-    </target>
-    <target name="tar" depends="package">
-        <tar compression="gzip" destfile="${ant.project.name}-${version}.tar.gz">
-            <tarfileset dir="${dist.dir}" prefix="${dist.dir}">
-            </tarfileset>
-        </tar>
-    </target>
-<!--
-    <target name="github" depends="resolve, package" description="Publish this build into repository">
-        <property name="ivy.local.default.ivy.pattern" value="[organisation]/[module]/[type]s/[artifact]-[revision].[ext]" />
-        <property name="ivy.local.default.artifact.pattern" value="[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"  />
-        <ivy:publish pubrevision="${version}" status="release" resolver="github-repo-local" overwrite="true" >
-               <artifacts pattern="target/bin/[artifact]-[revision].[ext]"/>
-        </ivy:publish>
-    </target>
--->
-<!--
-    <property environment="env"></property>
-	<property name="findbugs.home" value="${env.FINDBUGS_HOME}"/>
-	 <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
-	 <target name="findbugs">
-	 	<findbugs home="${findbugs.home}"
-	              output="xml:withMessages"
-	              outputFile="findbugs.xml" >
-	      <sourcePath path="${src.dir}/" />
-	      <class location="${classes.dir}" />
-	    </findbugs>
-	  </target>
--->
 </project>
 

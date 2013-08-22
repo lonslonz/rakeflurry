@@ -1,5 +1,5 @@
 
-                   Rakeflurry Vesion 0.5.0
+                   Rakeflurry 0.6.0
                    Release Notes
 
 --------------------
