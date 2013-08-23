@@ -1,7 +1,8 @@
 Rakeflurry
 ==========
 Server that collect app statistics data using flurry's api from api.flurry.com.
-- send command requests via HTTP.
+- send command requests via REST HTTP api.
+- get running or finished jobs' information using REST HTTP api.
 - copy data to hdfs storage for further processing.
 - call api every econd (flurry's rate limit)
 - when jobs failed or finished, send mail to admin.
