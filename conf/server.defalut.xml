@@ -7,6 +7,10 @@
                  class="com.skplanet.rakeflurry.service.CollectApi" 
                  exec="request" 
                  method="post"/>
+        <service url="/recover" 
+                 class="com.skplanet.rakeflurry.service.RecoverApi" 
+                 exec="request" 
+                 method="post"/>
         <service url="/collect/show" 
                  class="com.skplanet.rakeflurry.service.ShowJobs" 
                  exec="request" 
