@@ -30,11 +30,22 @@ Configuration
 
 DB Configuration
 - create database rakeflurry
-- execute ./sql/create.sql on rakeflurry db.
-
+- create schema using ./sql/create.sql on rakeflurry db.
 
 Server management
 - startup : ./bin/start.sh
 - stop : ./bin/stop.sh
 
 
+### API
+default address : http://localhost:8100/rakeflurry/
+
+##### /rakeflurry/collect
+
+Description
+- collect data from 
+- Post message를 json으로 정의
+Method
+- HTTP POST
+Parameters
+- Completely the same as parameters of /mail/send. Only difference is using son. 
