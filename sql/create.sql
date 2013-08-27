@@ -12,6 +12,8 @@ MySQL - 5.5.21 : Database - rakeflurry
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+USE `rakeflurry`;
+
 /*Table structure for table `tb_accesscode` */
 
 CREATE TABLE `tb_accesscode` (
@@ -24,9 +26,10 @@ CREATE TABLE `tb_accesscode` (
   `total_count` int(11) DEFAULT NULL,
   `running_status` varchar(32) DEFAULT NULL,
   `source_uri` varchar(1024) DEFAULT NULL,
+  `worker` varchar(64) DEFAULT NULL,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`accesscode_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=230 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `tb_api` */
 
@@ -43,7 +46,7 @@ CREATE TABLE `tb_api` (
   `retry_count` int(11) DEFAULT '0',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`api_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3250 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3980 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `tb_apikey` */
 
@@ -60,7 +63,7 @@ CREATE TABLE `tb_apikey` (
   `error_msg` varchar(2048) DEFAULT NULL,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`apikey_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=347 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=461 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `tb_appmetrics` */
 
@@ -71,20 +74,6 @@ CREATE TABLE `tb_appmetrics` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
-
-/*Data for the table `tb_appmetrics` */
-
-insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (1,'ActiveUsers',1,'2013-08-07 16:31:44');
-insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (2,'ActiveUsersByWeek',1,'2013-08-07 11:21:07');
-insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (3,'ActiveUsersByMonth',1,'2013-08-07 11:21:09');
-insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (4,'NewUsers',1,'2013-08-07 11:21:10');
-insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (5,'MedianSessionLength',1,'2013-08-07 11:21:13');
-insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (6,'AvgSessionLength',1,'2013-08-07 11:21:16');
-insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (7,'Sessions',1,'2013-08-07 11:21:19');
-insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (8,'RetainedUsers',1,'2013-08-07 11:21:21');
-insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (9,'PageViews',1,'2013-08-07 11:21:23');
-insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (10,'AvgPageViewsPerSession',1,'2013-08-07 11:21:23');
-
 
 /*Table structure for table `tb_dashboard` */
 
@@ -99,7 +88,7 @@ CREATE TABLE `tb_dashboard` (
   `recover_me_id` int(11) DEFAULT NULL,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`dashboard_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=115 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=153 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `tb_keymap` */
 
@@ -123,6 +112,29 @@ CREATE TABLE `tb_rcpt` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`rcpt_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Table structure for table `tb_worker` */
+
+CREATE TABLE `tb_worker` (
+  `worker_id` int(11) NOT NULL AUTO_INCREMENT,
+  `server_addr` varchar(64) NOT NULL,
+  `worker_count` int(11) DEFAULT '1',
+  `valid` int(11) DEFAULT '1',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`worker_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
+insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (1,'ActiveUsers',1,'2013-08-07 16:31:44');
+insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (2,'ActiveUsersByWeek',1,'2013-08-07 11:21:07');
+insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (3,'ActiveUsersByMonth',1,'2013-08-07 11:21:09');
+insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (4,'NewUsers',1,'2013-08-07 11:21:10');
+insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (5,'MedianSessionLength',1,'2013-08-07 11:21:13');
+insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (6,'AvgSessionLength',1,'2013-08-07 11:21:16');
+insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (7,'Sessions',1,'2013-08-07 11:21:19');
+insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (8,'RetainedUsers',1,'2013-08-07 11:21:21');
+insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (9,'PageViews',1,'2013-08-07 11:21:23');
+insert  into `tb_appmetrics`(`id`,`metric_name`,`used`,`update_time`) values (10,'AvgPageViewsPerSession',1,'2013-08-07 11:21:23');
+
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
