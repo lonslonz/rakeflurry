@@ -13,12 +13,12 @@ import com.skplanet.cask.container.ServiceRuntimeInfo;
 import com.skplanet.cask.container.model.SimpleParams;
 import com.skplanet.cask.container.service.SimpleService;
 import com.skplanet.cask.util.StringUtil;
-import com.skplanet.rakeflurry.collector.CollectParams;
 import com.skplanet.rakeflurry.collector.Collector;
 import com.skplanet.rakeflurry.dashboard.DashBoard;
 import com.skplanet.rakeflurry.file.FileManager;
 import com.skplanet.rakeflurry.meta.AppMetricsApi;
 import com.skplanet.rakeflurry.meta.KeyMapDef;
+import com.skplanet.rakeflurry.model.CollectParams;
 import com.skplanet.rakeflurry.model.KeyMapModel;
 
 public class ShowJobs implements SimpleService {

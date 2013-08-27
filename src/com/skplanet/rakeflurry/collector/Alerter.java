@@ -101,6 +101,18 @@ public class Alerter {
             logger.error("send http error : {}", StringUtil.exception2Str(e));
         }
     }
+    public void errorCollectPartApiService(String msg) throws Exception {
+        try {
+            setSubject("ERROR", "Collecting Api Service failed.");
+            this.message = String.format(
+                    "%s", 
+                    msg);
+            this.message = getCommonMsg() + this.message;
+            sendHttp();
+        } catch (Exception e) {
+            logger.error("send http error : {}", StringUtil.exception2Str(e));
+        }
+    }
     public void errorRecoverApiService(String msg) throws Exception {
         try {
             setSubject("ERROR", "Recorvering Api Service failed.");
@@ -172,5 +184,8 @@ public class Alerter {
     }
     public void finishNoRecoverApiService(DashBoard dashboard) throws Exception {
         finishCollectApiServiceLow(dashboard, "Recovering api service finished. Nothing executed. No Previous Error.");
+    }
+    public void finishCollectPartApiService(DashBoard dashboard) throws Exception {
+        finishCollectApiServiceLow(dashboard, "Collecting part api service finished.");
     }
 }

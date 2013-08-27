@@ -12,13 +12,13 @@ import com.skplanet.cask.container.ServiceRuntimeInfo;
 import com.skplanet.cask.container.model.SimpleParams;
 import com.skplanet.cask.container.service.SimpleService;
 import com.skplanet.cask.util.StringUtil;
-import com.skplanet.rakeflurry.collector.CollectParams;
 import com.skplanet.rakeflurry.collector.Collector;
 import com.skplanet.rakeflurry.collector.Alerter;
 import com.skplanet.rakeflurry.collector.UserManager;
 import com.skplanet.rakeflurry.dashboard.DashBoard;
 import com.skplanet.rakeflurry.file.FileManager;
 import com.skplanet.rakeflurry.meta.AppMetricsApi;
+import com.skplanet.rakeflurry.model.CollectParams;
 import com.skplanet.rakeflurry.model.KeyMapModel;
 import com.skplanet.rakeflurry.util.Right;
 
@@ -33,7 +33,10 @@ public class RecoverApi implements SimpleService {
         
         logger.info("start recover api  service. {}", request.getParams());
         
-        if(!UserManager.validate(request.get("id"), request.get("password"))) {
+        ObjectMapper mapper = new ObjectMapper();
+        CollectParams params = mapper.convertValue(request.getParams(), CollectParams.class);
+        
+        if(!UserManager.validate(params.getId(), params.getPassword())) {
             throw new Exception("id or password not valid.");
         }
         
@@ -45,26 +48,22 @@ public class RecoverApi implements SimpleService {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
             
-            ObjectMapper mapper = new ObjectMapper();
-            CollectParams params = mapper.convertValue(request.get("options"), CollectParams.class);
-            params.init();
-            
             FileManager.getInstance().init();
             AppMetricsApi.getInstance().init();
             
             DashBoard prevDashboard = null;
-            if(params.getDashboardId() != null) {
-                prevDashboard = DashBoard.selectById(params.getDashboardId());
+            if(params.getOptions().getDashboardId() != null) {
+                prevDashboard = DashBoard.selectById(params.getOptions().getDashboardId());
             } else {
-                if(params.getRecover() != null) {
-                    prevDashboard = DashBoard.selectLastOne(params.getRecover());    
+                if(params.getOptions().getRecover() != null) {
+                    prevDashboard = DashBoard.selectLastOne(params.getOptions().getRecover());    
                 } else {
                     prevDashboard = DashBoard.selectLastOne(true);
                 }
                 
             }
             if(prevDashboard == null) {
-                throw new Exception("there is no dashboard. id : " + params.getDashboardId());
+                throw new Exception("there is no dashboard. id : " + params.getOptions().getDashboardId());
             }
             List<KeyMapModel> kmmList = prevDashboard.filterFailedKeyMap();
             
@@ -78,13 +77,15 @@ public class RecoverApi implements SimpleService {
                 recoverDashboard.initWithKeyMapList(kmmList);
                 
                 recoverDashboard.setRecoverWhoId(prevDashboard.getDashboardId());
+                recoverDashboard.setCallEndDay(prevDashboard.getCallEndDay());
+                recoverDashboard.setCallStartDay(prevDashboard.getCallStartDay());
                 recoverDashboard.saveAllIntoDb();
                 
                 prevDashboard.setRecoverMeId(recoverDashboard.getDashboardId());
                 prevDashboard.update();
                 
                 Collector collector = new Collector(params, recoverDashboard);
-                collector.collect();
+                collector.recover();
                 
                 resultMap.put("results",  recoverDashboard);
             }

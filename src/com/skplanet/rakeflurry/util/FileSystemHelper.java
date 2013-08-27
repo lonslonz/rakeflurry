@@ -1,4 +1,4 @@
-package com.skplanet.rakeflurry.file;
+package com.skplanet.rakeflurry.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import com.skplanet.cask.util.Pair;
 import com.skplanet.cask.util.StringUtil;
+import com.skplanet.rakeflurry.file.DirStatus;
  
 public class FileSystemHelper {
 

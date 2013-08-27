@@ -69,7 +69,7 @@
         <mapping class="com.skplanet.rakeflurry.dashboard.AccessCodeSummary"/>
         <mapping class="com.skplanet.rakeflurry.dashboard.ApiKeySummary"/>
         <mapping class="com.skplanet.rakeflurry.dashboard.ApiSummary"/>
-        
+        <mapping class="com.skplanet.rakeflurry.db.WorkerDao"/>
 
     </session-factory>
 

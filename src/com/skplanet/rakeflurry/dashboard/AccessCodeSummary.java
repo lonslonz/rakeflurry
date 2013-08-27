@@ -50,6 +50,7 @@ public class AccessCodeSummary {
     private RunningStatus runningStatus = RunningStatus.STANDBY;
     private String sourceUri = null;
     private String updateTime = null;   
+    private String worker = null;
     
     public void init(String accessCode, String mbrNo, List<String> apiKeyList, DashBoard parent) {
         this.accessCode = accessCode;
@@ -171,6 +172,14 @@ public class AccessCodeSummary {
     }
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
+    }
+    @Column(name="worker")
+    public String getWorker() {
+        return worker;
+    }
+
+    public void setWorker(String worker) {
+        this.worker = worker;
     }
     
 }

@@ -29,6 +29,8 @@ import com.skplanet.rakeflurry.db.HiberUtil;
 import com.skplanet.rakeflurry.file.FileManager;
 import com.skplanet.rakeflurry.meta.AppMetricsApi;
 import com.skplanet.rakeflurry.meta.KeyMapDef;
+import com.skplanet.rakeflurry.model.CollectOptions;
+import com.skplanet.rakeflurry.model.CollectParams;
 import com.skplanet.rakeflurry.service.CollectApi;
 
 // certain api key, access code
@@ -63,6 +65,11 @@ public class AppMetrics {
         
         acs.setStartTime(dateFormat.format(new Date()));
         acs.setRunningStatus(RunningStatus.DOWNLOADING);
+        PartInfo partInfo = CollectOptions.getPartInfo(params.getOptions());
+        if(partInfo.getServerId() != null) {
+            acs.setWorker(partInfo.toString());
+        }
+        
         HiberUtil.update(acs, "update starting access summary code.");
         
         List<ApiKeySummary> aksList = acs.getApiKeySummaries();
@@ -169,8 +176,8 @@ public class AppMetrics {
                                     as.getApi(),
                                     acs.getAccessCode(), 
                                     aks.getApiKey(),
-                                    params.getStartDay(),
-                                    params.getEndDay());
+                                    dashboard.getCallStartDay(),
+                                    dashboard.getCallEndDay());
                 
                 logger.info("url : {}",  url);
                 result = HttpRequest.sendHttpGet(url);

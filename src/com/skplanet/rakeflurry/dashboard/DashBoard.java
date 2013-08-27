@@ -27,10 +27,12 @@ import org.hibernate.annotations.FetchMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.skplanet.rakeflurry.collector.CollectParams;
+import com.skplanet.rakeflurry.collector.PartInfo;
 import com.skplanet.rakeflurry.db.HiberUtil;
 import com.skplanet.rakeflurry.db.KeyMapDao;
 import com.skplanet.rakeflurry.meta.KeyMapDef;
+import com.skplanet.rakeflurry.model.CollectOptions;
+import com.skplanet.rakeflurry.model.CollectParams;
 import com.skplanet.rakeflurry.model.KeyMapModel;
 
 @Entity
@@ -53,7 +55,6 @@ public class DashBoard {
     private String callEndDay = null;
     private Integer recoverWhoId = null;
     private Integer recoverMeId = null;
-    
     
     public void init(KeyMapDef keyMapDef) {
         initWithKeyMapList(keyMapDef.getKeyMapList());
@@ -259,6 +260,18 @@ public class DashBoard {
             }
         }
     }
+    public void removeAcsButTarget(CollectOptions options) {
+        PartInfo partInfo = CollectOptions.getPartInfo(options);
+        for(int i = 0; i < accessCodeSummaries.size(); ++i) { 
+            AccessCodeSummary currAcs = accessCodeSummaries.get(i);
+            
+            if(currAcs.getAccessCodeId() % partInfo.getTotalServerCount() != partInfo.getServerId()) {
+                accessCodeSummaries.remove(i);
+                logger.info("remove acs but target. access code id : {}, name : {}, part Info : {}", 
+                        new Object[]{currAcs.getAccessCodeId(), currAcs.getAccessCode(), partInfo});
+            }
+        }
+    }
     public AccessCodeSummary getAccessCodeSummary(String accessCode) {
         
         for(int i = 0; i < accessCodeSummaries.size(); ++i) {
@@ -361,6 +374,7 @@ public class DashBoard {
     public void setRecoverMeId(Integer recoverMeId) {
         this.recoverMeId = recoverMeId;
     }
+    
     
 
     

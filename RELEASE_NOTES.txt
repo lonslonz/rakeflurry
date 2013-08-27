@@ -1,8 +1,11 @@
 
-                   Rakeflurry 0.6.1
+                   Rakeflurry 0.7.0
                    Release Notes
 
 --------------------
+0.7.0
+- collecting data by multi-thread. 
+
 0.6.1
 - minor build change.
 
