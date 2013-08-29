@@ -57,7 +57,7 @@ Parameters
  - duration : get data of last n days.
  - multi : When true, collecting executed concurrently by multi-thread. (default : true)
            You can specify involved servers and num of threads of involved servers in tb_worker table.
-           If multi is true, server read tb_worker when called /collect and then send request each server for concurrent exection.
+           server read tb_worker when called /collect and then send request each server for concurrent exection.
            If not, server collect data by itself.
 
 eg.)
