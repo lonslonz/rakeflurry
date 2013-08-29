@@ -55,6 +55,10 @@ Parameters
 - password : your password. id and password must be the same to one specified in server.xml.
 - options : options for collecting.
  - duration : get data of last n days.
+ - multi : When true, collecting executed concurrently by multi-thread. (default : true)
+           You can specify involved servers and num of threads of involved servers in tb_worker table.
+           If multi is true, server read tb_worker when called /collect and then send request each server for concurrent exection.
+           If not, server collect data by itself.
 
 eg.)
 address : http://localhost:8100/rakeflurry/collect
@@ -63,7 +67,7 @@ post message :
 {
 "id" : "your id",  
 "password" : "your password. ",
-"options" : {"duration" : "30"}
+"options" : {"duration" : "30", "multi" : "true"}
 }
 ```
 
