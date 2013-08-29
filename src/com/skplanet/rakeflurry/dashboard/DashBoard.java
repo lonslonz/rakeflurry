@@ -262,13 +262,22 @@ public class DashBoard {
     }
     public void removeAcsButTarget(CollectOptions options) {
         PartInfo partInfo = CollectOptions.getPartInfo(options);
-        for(int i = 0; i < accessCodeSummaries.size(); ++i) { 
-            AccessCodeSummary currAcs = accessCodeSummaries.get(i);
+        int current = 0;
+        
+        for(; current < accessCodeSummaries.size(); ) { 
+            AccessCodeSummary currAcs = accessCodeSummaries.get(current);
+            
+            logger.debug("acs id : {}, part info : {}, % : {}", new Object[]{
+                    currAcs.getAccessCodeId(), partInfo.toString(), currAcs.getAccessCodeId() % partInfo.getTotalServerCount()});
             
             if(currAcs.getAccessCodeId() % partInfo.getTotalServerCount() != partInfo.getServerId()) {
-                accessCodeSummaries.remove(i);
+                accessCodeSummaries.remove(current);
+                current = 0;
                 logger.info("remove acs but target. access code id : {}, name : {}, part Info : {}", 
                         new Object[]{currAcs.getAccessCodeId(), currAcs.getAccessCode(), partInfo});
+                
+            } else {
+                ++current;
             }
         }
     }

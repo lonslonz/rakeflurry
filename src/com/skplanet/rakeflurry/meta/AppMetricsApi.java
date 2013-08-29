@@ -19,7 +19,7 @@ import com.skplanet.rakeflurry.service.CollectApi;
 public class AppMetricsApi {  
     private List<String> apiList = new ArrayList<String>();
     private static AppMetricsApi instance = new AppMetricsApi(); 
-    public static AppMetricsApi getInstance() {
+    public static synchronized AppMetricsApi getInstance() {
         return instance;
     }
     public List<String> getApiList() {

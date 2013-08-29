@@ -31,7 +31,7 @@ public class FileManager {
     
     private Logger logger = LoggerFactory.getLogger(FileManager.class);
     
-    public static FileManager getInstance() {
+    public static synchronized FileManager getInstance() {
         return instance;
     }
     

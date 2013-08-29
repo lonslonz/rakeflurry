@@ -33,7 +33,7 @@ public class KeyMapDef {
         try {
             tx = session.beginTransaction();
             
-            String hql  = "from KeyMapDao K order by K.mbrNo, K.accessCode, K.apiKey";
+            String hql  = "from KeyMapDao K where K.used = 1 order by K.mbrNo, K.accessCode, K.apiKey";
             Query query = session.createQuery(hql);
             
             List result = query.list();
