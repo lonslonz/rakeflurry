@@ -32,6 +32,7 @@ Configuration
 DB Configuration
 - create database rakeflurry
 - create schema using ./sql/create.sql on rakeflurry db.
+- insert your server information into tb_worker.
 
 Server management
 - startup : ./bin/start.sh
