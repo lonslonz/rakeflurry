@@ -23,7 +23,7 @@ Install
 - unzip
 - ant resolve
 - ant
-- deploy ./PrimMailer-x.x.x.tar.gz and unzip 
+- deploy ./rakeflurry-x.x.x.tar.gz and unzip 
 
 Configuration
 - ./conf/server.xml : copy from server.default.xml, set your port, hadoop server, PrimeMailer server.
