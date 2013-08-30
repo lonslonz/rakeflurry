@@ -138,7 +138,7 @@ public class Alerter {
         }
     }
     
-    public void finishCollectApiServiceLow(DashBoard dashboard, String subject) throws Exception {
+    public void finishCollectApiServiceLow(DashBoard dashboard, String subject, boolean hasError) throws Exception {
         try {
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             
@@ -147,9 +147,7 @@ public class Alerter {
             
             float elapsed = (float)(end.getTime() - start.getTime())/1000;
             
-            boolean hasError = dashboard.hasError();
-            setSubject("Job Reporting", subject);
-            this.subject += hasError ? "Fail" : "Success";
+            setSubject("Job Reporting", (hasError ? "Fail" : "Success") + ". " + subject);
             
             this.message = String.format(
                             "%s" + 
@@ -176,16 +174,16 @@ public class Alerter {
             logger.error("send http error : {}", StringUtil.exception2Str(e));
         }
     }
-    public void finishCollectApiService(DashBoard dashboard) throws Exception {
-        finishCollectApiServiceLow(dashboard, "Collecting api service finished.");
+    public void finishCollectApiService(DashBoard dashboard, boolean hasError) throws Exception {
+        finishCollectApiServiceLow(dashboard, "Collecting api service finished.", hasError);
     }
-    public void finishRecoverApiService(DashBoard dashboard) throws Exception {
-        finishCollectApiServiceLow(dashboard, "Recovering api service finished.");
+    public void finishRecoverApiService(DashBoard dashboard, boolean hasError) throws Exception {
+        finishCollectApiServiceLow(dashboard, "Recovering api service finished.", hasError);
     }
-    public void finishNoRecoverApiService(DashBoard dashboard) throws Exception {
-        finishCollectApiServiceLow(dashboard, "Recovering api service finished. Nothing executed. No Previous Error.");
-    }
-    public void finishCollectPartApiService(DashBoard dashboard) throws Exception {
-        finishCollectApiServiceLow(dashboard, "Collecting part api service finished.");
+    public void finishNoRecoverApiService(DashBoard dashboard, boolean hasError) throws Exception {
+        finishCollectApiServiceLow(
+                dashboard, 
+                "Recovering api service finished. Nothing executed. No Previous Error.", 
+                hasError);
     }
 }

@@ -280,6 +280,7 @@ public class DashBoard {
                 ++current;
             }
         }
+        totalCount = accessCodeSummaries.size();
     }
     public AccessCodeSummary getAccessCodeSummary(String accessCode) {
         

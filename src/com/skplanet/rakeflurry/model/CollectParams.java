@@ -41,7 +41,14 @@ public class CollectParams {
         cal.add(Calendar.DATE, Math.abs(this.options.getDuration()) * -1);
         startDay = dateFormat.format(cal.getTime());
     }
-
+    @JsonIgnore
+    public boolean isMulti() {
+        if(this.getOptions().getMulti() != null && this.getOptions().getMulti()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     
     public String getEndDay() {
         return endDay;

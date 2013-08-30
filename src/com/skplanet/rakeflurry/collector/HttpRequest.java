@@ -28,39 +28,59 @@ public class HttpRequest {
     
     public static String sendHttpGet(String url, int connTimeout, int soTimeout) throws Exception {
         
-        HttpClient httpClient = new DefaultHttpClient();
+        HttpClient httpClient = null;
+        HttpResponse response = null;
+        String result = null;
+        
+        
+        httpClient = new DefaultHttpClient();
         HttpGet method = new HttpGet(url);
         
         HttpParams httpParams = httpClient.getParams();
         HttpConnectionParams.setConnectionTimeout(httpParams, connTimeout * 1000); 
         HttpConnectionParams.setSoTimeout(httpParams, soTimeout * 1000);
         
-        HttpResponse response = httpClient.execute(method);
+        response = httpClient.execute(method);
         if(response.getStatusLine().getStatusCode() != 200) {
             
             String errorResult = makeReponseStr(response);
+            
             ObjectMapper mapper = new ObjectMapper();
-            FlurryErrorResponse fresp = mapper.readValue(errorResult, FlurryErrorResponse.class);
+            FlurryErrorResponse fresp = new FlurryErrorResponse();
+            try {
+                fresp = mapper.readValue(errorResult, FlurryErrorResponse.class);
+            } catch(Exception e) {
+                fresp.setCode("999");
+                fresp.setMessage("return status code not 200 and result json is not valid.");
+                throw new FlurryException(
+                        "errorResult : " + errorResult, 
+                        String.valueOf(response.getStatusLine().getStatusCode()),
+                        fresp);
+            }
             throw new FlurryException(
-                    "Flurry returns error.",
+                    "Flurry doesn't return 200 status with valid json.",
                     String.valueOf(response.getStatusLine().getStatusCode()),
                     fresp);
         }
         
-        String result = makeReponseStr(response);
-        httpClient.getConnectionManager().shutdown();
+        if(response != null) {
+            result = makeReponseStr(response);
+        }
+        if(httpClient != null) {
+            httpClient.getConnectionManager().shutdown();
+        }
         
         Map<String, String> resultMap = null;
         try {
-            // test if json
+            // test if valid json
             ObjectMapper mapper = new ObjectMapper();
             resultMap = mapper.readValue(result, Map.class);
         } catch(Exception e) {
             FlurryErrorResponse fresp = new FlurryErrorResponse();
             fresp.setCode("999");
-            fresp.setMessage("return html error page from flurry.");
+            fresp.setMessage("flurry doesn't return valid json. maybe html.");
             throw new FlurryException(
-                                "Flurry returns not json but html error page. " + result, 
+                                "result : " + result, 
                                 String.valueOf(response.getStatusLine().getStatusCode()),
                                 fresp);
         }

@@ -68,10 +68,10 @@ public class RecoverApi implements SimpleService {
             List<KeyMapModel> kmmList = prevDashboard.filterFailedKeyMap();
             
             DashBoard recoverDashboard = null;
+            boolean hasError = false;
             if(kmmList.size() == 0) {
                 logger.info("There is no error case. dashboard id : {}", prevDashboard.getDashboardId());
                 resultMap.put("results",  "no error");
-                
             } else {
                 recoverDashboard = new DashBoard();
                 recoverDashboard.initWithKeyMapList(kmmList);
@@ -87,18 +87,20 @@ public class RecoverApi implements SimpleService {
                 Collector collector = new Collector(params, recoverDashboard);
                 collector.recover();
                 
+                hasError = recoverDashboard.hasError();
                 resultMap.put("results",  recoverDashboard);
+                resultMap.put("returnCode", hasError ? 0 : 1);
             }
             response.setParams(resultMap);
             
             Alerter alerter = new Alerter();
             if(kmmList.size() != 0) {
-                alerter.finishRecoverApiService(recoverDashboard);
+                alerter.finishRecoverApiService(recoverDashboard, hasError);
             } else {
-                alerter.finishNoRecoverApiService(prevDashboard);
+                alerter.finishNoRecoverApiService(prevDashboard, true);
             }
             
-            logger.info("complete recover api  service : {} ", response.getParams());
+            logger.info("complete recover api  service : {} ", mapper.writeValueAsString(response.getParams()));
         } catch(Exception e) {
             resultMap.put("returnCode",  -1);
             resultMap.put("returnDesc",  "fail");

@@ -1,8 +1,13 @@
 
-                   Rakeflurry 0.7.0
+                   Rakeflurry 0.7.1
                    Release Notes
 
 --------------------
+0.7.1
+- #1 fixed : When flurry doesn't return 200 and return data is not valid json, exact exception is not delivered.
+- #2 fixed : When multi execution failed, alerting mail returns success.
+- #3 fixed : when muti execution, duplicated url requested.
+
 0.7.0
 - collecting data by multi-thread. 
 

@@ -17,24 +17,27 @@ import com.skplanet.rakeflurry.model.KeyMapModel;
 import com.skplanet.rakeflurry.service.CollectApi;
 
 public class AppMetricsApi {  
+    private Logger logger = LoggerFactory.getLogger(AppMetricsApi.class);
     private List<String> apiList = new ArrayList<String>();
     private static AppMetricsApi instance = new AppMetricsApi(); 
-    public static synchronized AppMetricsApi getInstance() {
+    public static AppMetricsApi getInstance() {
         return instance;
     }
-    public List<String> getApiList() {
+    public synchronized List<String> getApiList() {
         return apiList;
     }
-    public void init() {
+    public synchronized void init() {
         
         Logger logger = LoggerFactory.getLogger(AppMetricsApi.class);
+        logger.debug("AppMetrics api init start", apiList.size());
         
         apiList.clear();
+        logger.debug("api list.size() : {}", apiList.size());
         getDataFromDb();
         
         logger.info("app metrics api of flurry initialized. total {} api", apiList.size());
     }
-    public void getDataFromDb() {
+    private void getDataFromDb() {
         Session session = HiberUtil.openSession();
         Transaction tx = session.beginTransaction();
         
@@ -48,6 +51,7 @@ public class AppMetricsApi {
             AppMetricsDao obj = (AppMetricsDao)itRes.next();
             apiList.add(obj.getMetricName());
         }
+        logger.info("read api list from db : {}", apiList.toString());
         
         tx.commit();
         session.close();

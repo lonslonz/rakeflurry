@@ -65,13 +65,15 @@ public class CollectPartApi implements SimpleService {
             Collector collector = new Collector(params, dashboard);
             collector.collectPart();
                 
+            boolean hasError = dashboard.hasError();
             resultMap.put("results",  dashboard);
-            resultMap.put("process",  CollectOptions.getPartInfo(params.getOptions()));
+            resultMap.put("returnCode", hasError ? 0 : 1);
+            resultMap.put("worker",  CollectOptions.getPartInfo(params.getOptions()));
             response.setParams(resultMap);
             
             logger.info("complete collect part api service : {}, {} ", 
                     CollectOptions.getPartInfo(params.getOptions()),
-                    response.getParams());
+                    mapper.writeValueAsString(response.getParams()));
         } catch(Exception e) {
             resultMap.put("returnCode",  -1);
             resultMap.put("returnDesc",  "fail");

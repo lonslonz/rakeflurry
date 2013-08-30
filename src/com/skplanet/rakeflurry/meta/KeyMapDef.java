@@ -24,10 +24,12 @@ public class KeyMapDef {
     public void init() throws Exception {
         keyMapList.clear();
         keyMapList = getDataFromDb();
-        logger.info("read keymap from db");
+        logger.info("intialized read keymap from db");
     }
     
     public static List<KeyMapModel> getDataFromDb() throws Exception {
+        Logger loggerLocal = LoggerFactory.getLogger(KeyMapDef.class);
+        
         Session session = HiberUtil.openSession();
         Transaction tx = null;
         try {
@@ -56,6 +58,8 @@ public class KeyMapDef {
                 } 
                 kmm.getApiKeys().add(obj.getApiKey());
                 prev = curr;
+                loggerLocal.info("read one of keymap : {}, {}, {}", 
+                        new Object[]{kmm.getMbrNo(), kmm.getAccessCode(), obj.getApiKey()});
             }
             tx.commit();
             return kmmList;

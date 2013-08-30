@@ -102,7 +102,7 @@ public class AppMetrics {
         }
         logElapsed();
         HiberUtil.update(acs, "update finishing access summary code.");
-        return error;
+        return errorDetected;
     }
    
     public Boolean collectApiKey(AccessCodeSummary acs, ApiKeySummary aks) throws Exception {
@@ -123,6 +123,7 @@ public class AppMetrics {
         aks.setFileName(fileName);
         
         ApiSummary as = null;
+        logger.debug("api list.size : {}", apiList.size());
         for(int i = 0; i < apiList.size(); i++) {
             try {
                 logger.info("try api, access code : {}, api key : {}, api : {}",  
@@ -131,7 +132,7 @@ public class AppMetrics {
                 as = new ApiSummary();
                 as.init(apiList.get(i), aks);
                 aks.getApiSummaries().add(as);
-                HiberUtil.update(aks, "update starting api key.");
+                HiberUtil.update(aks, "update db about starting api key.");
                 
                 String result = requestApiWithRetry(acs, aks, as);
                 bw.write(result);
@@ -165,7 +166,7 @@ public class AppMetrics {
         as.setStartTime(dateFormat.format(new Date()));
         as.setRunningStatus(RunningStatus.DOWNLOADING);
         as.setRetryCount(0);
-        HiberUtil.update(as, "update starting api.");
+        HiberUtil.update(as, "update db about starting api.");
         
         long elapsed = 0;
         while(true) {

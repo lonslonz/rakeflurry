@@ -31,11 +31,11 @@ public class FileManager {
     
     private Logger logger = LoggerFactory.getLogger(FileManager.class);
     
-    public static synchronized FileManager getInstance() {
+    public static FileManager getInstance() {
         return instance;
     }
     
-    public void init() throws Exception {
+    public synchronized void init() throws Exception {
         
         String dateDir = dirDateFormat.format(new Date());
         localDataDir = 
@@ -54,11 +54,10 @@ public class FileManager {
                 throw new Exception("mkdirs failed. " + localDataDir);
             }
         }
-        logger.info("local dir created.");
         mkdirHdfs();
         logger.info("FileManager initialized.");
     }
-    public void mkdirHdfs() throws Exception {
+    private void mkdirHdfs() throws Exception {
         // acs hdfs file + aks file name 
         String strUri = ConfigReader.getInstance().getServerConfig().getPropValue("hdfsDestUri");
         destUri = new URI(strUri);
@@ -80,7 +79,7 @@ public class FileManager {
             }
         }
     }
-    public void chmodAllDir(URI destUri, String destDir) throws Exception {
+    private void chmodAllDir(URI destUri, String destDir) throws Exception {
         
         String[] destDirArray = destDir.split("/");
         
@@ -105,7 +104,7 @@ public class FileManager {
         
     }
    
-    public void chmodFile(URI destUri, String destFile) throws Exception {
+    private void chmodFile(URI destUri, String destFile) throws Exception {
         String permission = ConfigReader.getInstance().getServerConfig().getPropValue("hdfsChmod");
         short realPerm = Short.parseShort(permission, 8);
         FileSystemHelper.chmod(destUri, destFile, realPerm);

@@ -5,11 +5,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -21,18 +20,14 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import antlr.StringUtils;
-
 import com.skplanet.cask.container.config.ConfigReader;
 import com.skplanet.cask.util.StringUtil;
 import com.skplanet.rakeflurry.dashboard.AccessCodeSummary;
 import com.skplanet.rakeflurry.dashboard.DashBoard;
 import com.skplanet.rakeflurry.db.HiberUtil;
 import com.skplanet.rakeflurry.db.WorkerDao;
-import com.skplanet.rakeflurry.meta.AppMetricsApi;
 import com.skplanet.rakeflurry.model.CollectOptions;
 import com.skplanet.rakeflurry.model.CollectParams;
-import com.skplanet.rakeflurry.util.HttpUtil;
 
 public class Collector {
     private Logger logger = LoggerFactory.getLogger(Collector.class);
@@ -50,8 +45,8 @@ public class Collector {
         this.dashboard = dashboard;
     }
     
-    public void collectMulti() throws Exception {
-        if(params.getOptions().getMulti() != null && params.getOptions().getMulti()) {
+    public void collect() throws Exception {
+        if(params.isMulti()) {
             collectMultiLow();
         } else {
             collectLow(false);
@@ -151,10 +146,16 @@ public class Collector {
     private void collectCore() throws Exception {
         AppMetrics appMetrics = new AppMetrics(params, dashboard);
         List<AccessCodeSummary> acsList = dashboard.getAccessCodeSummaries();
-        for(int i = 0; i < acsList.size(); ++i) {
+        
+        int i;
+        for(i = 0; i < acsList.size(); ++i) {
         
             AccessCodeSummary acs = acsList.get(i);
-            Boolean error = appMetrics.collectAccessCode(acs);
+            appMetrics.collectAccessCode(acs);
+        }
+        
+        if(i == 0) {
+            logger.info("Nothing to do. There is no access code summaries. {}", CollectOptions.getPartInfo(params.getOptions()));
         }
     }
     public List<WorkerDao> selectWorker()  throws Exception {

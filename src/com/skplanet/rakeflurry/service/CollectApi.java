@@ -74,16 +74,22 @@ public class CollectApi implements SimpleService {
             dashboard.saveAllIntoDb();
                         
             Collector collector = new Collector(params, dashboard);
-            collector.collectMulti();
+            collector.collect();
             
+            if(params.isMulti()) {
+                dashboard = DashBoard.selectById(dashboard.getDashboardId()); 
+            }
+            
+            boolean hasError = dashboard.hasError();
             resultMap.put("results",  dashboard);
+            resultMap.put("returnCode", hasError ? 0 : 1);
             
             response.setParams(resultMap);
             
             Alerter alerter = new Alerter();
-            alerter.finishCollectApiService(dashboard);
+            alerter.finishCollectApiService(dashboard, hasError);
             
-            logger.info("complete collect service : {} ", response.getParams());
+            logger.info("complete collect service : {} ", mapper.writeValueAsString(response.getParams()));
         } catch(Exception e) {
             resultMap.put("returnCode",  -1);
             resultMap.put("returnDesc",  "fail");
