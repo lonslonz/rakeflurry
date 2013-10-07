@@ -1,0 +1,27 @@
+
+Rakeflurry 0.8.0
+Information
+
+Lee, Jongmin(lonslonz@sk.com)
+
+--------------------
++ flurry.com api call
+
+APIs : AppMetrics apis of flurry.com called. (http://support.flurry.com/index.php?title=API/Code)
+- ActiveUsers
+- ActiveUsersByWeek
+- ActiveUsersByMonth
+- NewUsers
+- MedianSessionLength
+- AvgSessionLength
+- Sessions
+- RetainedUsers
+- PageViews
+- AvgPageViewsPerSession
+
+Execution : once a day
+- begin time : 15:00 KST / day
+- wait time for next call : 1.2 sec
+
+
+ 
