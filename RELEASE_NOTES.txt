@@ -1,8 +1,13 @@
 
-                   Rakeflurry 0.7.1
+                   Rakeflurry 0.8.0
                    Release Notes
 
 --------------------
+0.8.0
+- #4 : add monthly api
+- add info.txt
+- add version to mail report.
+
 0.7.1
 - #1 fixed : When flurry doesn't return 200 and return data is not valid json, exact exception is not delivered.
 - #2 fixed : When multi execution failed, alerting mail returns success.

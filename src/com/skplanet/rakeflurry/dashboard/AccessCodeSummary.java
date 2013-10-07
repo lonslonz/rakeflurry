@@ -25,10 +25,10 @@ import org.hibernate.annotations.FetchMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.skplanet.rakeflurry.db.HiberUtil;
 import com.skplanet.rakeflurry.file.FileManager;
 import com.skplanet.rakeflurry.meta.AppMetricsApi;
 import com.skplanet.rakeflurry.meta.KeyMapDef;
+import com.skplanet.rakeflurry.util.HiberUtil;
 
 @Entity
 @Table(name="tb_accesscode")
@@ -62,7 +62,7 @@ public class AccessCodeSummary {
             String apiKey = apiKeyList.get(i);
             ApiKeySummary apiKeySummary = new ApiKeySummary();
             
-            apiKeySummary.init(apiKey, AppMetricsApi.getInstance().getApiList(), this);
+            apiKeySummary.init(apiKey,  this);
             apiKeySummaries.add(apiKeySummary);
         }
         totalCount = apiKeySummaries.size();

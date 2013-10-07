@@ -41,7 +41,7 @@ public class ApiKeySummary {
     private String updateTime = null;
     private String errorMsg = null;
     
-    public void init(String apiKey, List<String> apiList, AccessCodeSummary parent) {
+    public void init(String apiKey, AccessCodeSummary parent) {
         
         this.apiKey = apiKey;
         this.totalCount = AppMetricsApi.getInstance().getApiList().size();

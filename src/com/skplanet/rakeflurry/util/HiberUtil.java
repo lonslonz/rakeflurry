@@ -1,4 +1,4 @@
-package com.skplanet.rakeflurry.db;
+package com.skplanet.rakeflurry.util;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;

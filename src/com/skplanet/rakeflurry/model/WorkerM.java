@@ -1,4 +1,4 @@
-package com.skplanet.rakeflurry.db;
+package com.skplanet.rakeflurry.model;
 
 import java.util.Date;
 
@@ -10,7 +10,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="tb_worker")
-public class WorkerDao {
+public class WorkerM {
     private Integer workerId;
     private String serverAddr;
     private Integer workerCount;

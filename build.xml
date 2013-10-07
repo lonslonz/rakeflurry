@@ -13,7 +13,7 @@
 	<property name="release.txt" value="RELEASE_NOTES.txt"/>
 	<property name="test.dir" value="test"/>
 	<property name="report.dir" value="report"/>
-	
+	<property name="info.txt" value="INFO.txt"/>
 	<property file="${src.dir}/version.properties"/>
 	<property name="version" value="${VERSION}"/>
 	<property name="dist.dir" value="${ant.project.name}-${version}"/>
@@ -73,6 +73,8 @@
 		<mkdir dir="${dist.dir}/${test.dir}"/>
 		<copy file="${release.txt}" todir="${dist.dir}"/>
 		<copy file="${release.txt}" tofile="${web.dir}/releasenotes"/>
+		<copy file="${info.txt}" todir="${dist.dir}"/>
+        <copy file="${info.txt}" tofile="${web.dir}/info"/>
 		<jar jarfile="${dist.dir}/${bin.dir}/${jar.file}" basedir="${classes.dir}" />
 		<tar compression="gzip" destfile="${tar.file}">
             <tarfileset dir="${dist.dir}" prefix="${dist.dir}">

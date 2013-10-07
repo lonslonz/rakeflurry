@@ -24,10 +24,10 @@ import com.skplanet.cask.container.config.ConfigReader;
 import com.skplanet.cask.util.StringUtil;
 import com.skplanet.rakeflurry.dashboard.AccessCodeSummary;
 import com.skplanet.rakeflurry.dashboard.DashBoard;
-import com.skplanet.rakeflurry.db.HiberUtil;
-import com.skplanet.rakeflurry.db.WorkerDao;
 import com.skplanet.rakeflurry.model.CollectOptions;
 import com.skplanet.rakeflurry.model.CollectParams;
+import com.skplanet.rakeflurry.model.WorkerM;
+import com.skplanet.rakeflurry.util.HiberUtil;
 
 public class Collector {
     private Logger logger = LoggerFactory.getLogger(Collector.class);
@@ -53,7 +53,7 @@ public class Collector {
         }
         
     }
-    private int calcWorkerSize(List<WorkerDao> workerList) {
+    private int calcWorkerSize(List<WorkerM> workerList) {
         int totalServerCount = 0;
         for(int i = 0; i < workerList.size(); i++) {
             totalServerCount += workerList.get(i).getWorkerCount();
@@ -61,7 +61,7 @@ public class Collector {
         return totalServerCount;
     }
     private void spread() throws Exception {
-        List<WorkerDao> workerList = selectWorker();
+        List<WorkerM> workerList = selectWorker();
         int totalWorkerCount = calcWorkerSize(workerList);
         
         int workerIndex = 0;
@@ -71,7 +71,7 @@ public class Collector {
         List<Future<String>> futureList = new ArrayList<Future<String>>();
         
         for(int i = 0; i < workerList.size(); i++) {
-            WorkerDao worker = workerList.get(i);
+            WorkerM worker = workerList.get(i);
             for(int j = 0; j < worker.getWorkerCount(); j++) {
                 CollectParams params = new CollectParams();
                 params.setId(ConfigReader.getInstance().getServerConfig().getPropValue("id"));
@@ -158,19 +158,19 @@ public class Collector {
             logger.info("Nothing to do. There is no access code summaries. {}", CollectOptions.getPartInfo(params.getOptions()));
         }
     }
-    public List<WorkerDao> selectWorker()  throws Exception {
+    public List<WorkerM> selectWorker()  throws Exception {
         Session session = HiberUtil.openSession();
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
             
-            String hql  = "from WorkerDao W where W.valid = 1 order by W.workerId desc";
+            String hql  = "from WorkerM W where W.valid = 1 order by W.workerId desc";
             Query query = session.createQuery(hql);
             
             List result = query.list();            
             
             tx.commit();
-            return (List<WorkerDao>)result;
+            return (List<WorkerM>)result;
         } catch(Exception e) {
             if(tx != null) {
                 tx.rollback();

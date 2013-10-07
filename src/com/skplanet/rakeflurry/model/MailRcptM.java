@@ -1,4 +1,4 @@
-package com.skplanet.rakeflurry.db;
+package com.skplanet.rakeflurry.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,7 +8,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="rakecommon.tb_rcpt")
-public class MailRcptDao {
+public class MailRcptM {
 
     private Integer rcptId;
     private String service;

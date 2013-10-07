@@ -17,8 +17,8 @@ import com.skplanet.rakeflurry.dashboard.ApiKeySummary;
 import com.skplanet.rakeflurry.dashboard.ApiSummary;
 import com.skplanet.rakeflurry.dashboard.DashBoard;
 import com.skplanet.rakeflurry.dashboard.RunningStatus;
-import com.skplanet.rakeflurry.db.HiberUtil;
 import com.skplanet.rakeflurry.util.FileSystemHelper;
+import com.skplanet.rakeflurry.util.HiberUtil;
 
 public class FileManager {
     private String localDataDir = null;

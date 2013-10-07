@@ -12,6 +12,8 @@ import javax.persistence.Table;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
+import com.skplanet.rakeflurry.model.AppMetricsM;
+
 @Entity
 @Table(name="tb_api")
 public class ApiSummary {
@@ -28,9 +30,13 @@ public class ApiSummary {
     private String updateTime = null;
     private Long elapsed = null;
     private Integer retryCount = null;
+    private Integer monthly = 0;
+    private Integer weekly = 0;
     
-    public void init(String api, ApiKeySummary parent) {
-        this.api = api;
+    public void init(AppMetricsM metricsM, ApiKeySummary parent) {
+        this.api = metricsM.getMetricName();
+        this.monthly = metricsM.getMonthly();
+        this.weekly = metricsM.getWeekly();
         this.parApiKeySummary = parent;
     }
     
@@ -105,7 +111,6 @@ public class ApiSummary {
     public Long getElapsed() {
         return elapsed;
     }
-
     public void setElapsed(Long elapsed) {
         this.elapsed = elapsed;
     }
@@ -115,5 +120,19 @@ public class ApiSummary {
     }
     public void setRetryCount(Integer retryCount) {
         this.retryCount = retryCount;
+    }
+    @Column(name = "monthly")
+    public Integer getMonthly() {
+        return monthly;
+    }
+    public void setMonthly(Integer monthly) {
+        this.monthly = monthly;
+    }
+    @Column(name = "weekly")
+    public Integer getWeekly() {
+        return weekly;
+    }
+    public void setWeekly(Integer weekly) {
+        this.weekly = weekly;
     }
 }

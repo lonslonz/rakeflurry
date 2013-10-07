@@ -12,10 +12,10 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.skplanet.rakeflurry.db.HiberUtil;
-import com.skplanet.rakeflurry.db.KeyMapDao;
+import com.skplanet.rakeflurry.model.KeyMapM;
 import com.skplanet.rakeflurry.model.KeyMapModel;
 import com.skplanet.rakeflurry.service.OverwriteKeyMap;
+import com.skplanet.rakeflurry.util.HiberUtil;
 
 public class KeyMapDef {
     private Logger logger = LoggerFactory.getLogger(KeyMapDef.class);
@@ -35,7 +35,7 @@ public class KeyMapDef {
         try {
             tx = session.beginTransaction();
             
-            String hql  = "from KeyMapDao K where K.used = 1 order by K.mbrNo, K.accessCode, K.apiKey";
+            String hql  = "from KeyMapM K where K.used = 1 order by K.mbrNo, K.accessCode, K.apiKey";
             Query query = session.createQuery(hql);
             
             List result = query.list();
@@ -47,7 +47,7 @@ public class KeyMapDef {
             List<KeyMapModel> kmmList = new ArrayList<KeyMapModel>();
             KeyMapModel kmm = new KeyMapModel();
             while(itRes.hasNext()) {
-                KeyMapDao obj = (KeyMapDao)itRes.next();
+                KeyMapM obj = (KeyMapM)itRes.next();
                 curr = obj.getMbrNo();
                 
                 if(prev == null || !curr.equals(prev)) {
@@ -79,19 +79,11 @@ public class KeyMapDef {
         try {
             tx = session.beginTransaction();
             
-            //String hql  = "DELETE FROM KeyMapDao K where K.mbrNo = :mbrNo";
-            String hql  = "DELETE FROM KeyMapDao K";
+            String hql  = "DELETE FROM KeyMapM K";
             Query query = session.createQuery(hql);
             int result = query.executeUpdate();
             logger.info("remove all keymap table, affected : {}", result);
             
-//            for(int i = 0 ; i < mbrNoList.size(); i++) {
-//                String curr = mbrNoList.get(i);
-//                
-//                //query.setParameter("mbrNo", curr);
-//                int result = query.executeUpdate();
-//                logger.info("remove mbr no : {}, affected : {}", curr, result);
-//            }
             tx.commit();
         }catch(Exception e) {
             if(tx != null) {
@@ -102,7 +94,7 @@ public class KeyMapDef {
             session.close();
         }
     }
-    public static void insertAll(List<KeyMapDao> keyMapDaoList) throws Exception  {
+    public static void insertAll(List<KeyMapM> keyMapMList) throws Exception  {
         Logger logger = LoggerFactory.getLogger(KeyMapDef.class);
         Session session = HiberUtil.openSession();
         Transaction tx = null;
@@ -110,8 +102,8 @@ public class KeyMapDef {
         try {
             tx = session.beginTransaction();
         
-            for(int i = 0; i < keyMapDaoList.size(); i++) {
-                KeyMapDao obj = keyMapDaoList.get(i);
+            for(int i = 0; i < keyMapMList.size(); i++) {
+                KeyMapM obj = keyMapMList.get(i);
                 session.save(obj);
                 logger.info("save : mbr no : {}, access code : {}, api key : {}", 
                             new Object[]{obj.getMbrNo(), obj.getAccessCode(), obj.getApiKey()});

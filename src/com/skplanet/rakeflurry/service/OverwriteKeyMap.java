@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +16,8 @@ import com.skplanet.cask.container.service.SimpleService;
 import com.skplanet.cask.util.StringUtil;
 import com.skplanet.rakeflurry.collector.Alerter;
 import com.skplanet.rakeflurry.collector.UserManager;
-import com.skplanet.rakeflurry.db.HiberUtil;
-import com.skplanet.rakeflurry.db.KeyMapDao;
 import com.skplanet.rakeflurry.meta.KeyMapDef;
+import com.skplanet.rakeflurry.model.KeyMapM;
 import com.skplanet.rakeflurry.model.KeyMapModel;
 
 public class OverwriteKeyMap implements SimpleService {
@@ -44,28 +40,32 @@ public class OverwriteKeyMap implements SimpleService {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
             ObjectMapper mapper = new ObjectMapper();
+            
+            if(request.get("keymap") == null) {
+                throw new Exception("keymap is null.");
+            }
             List keyMapList = mapper.convertValue(request.get("keymap"), List.class);
             
             Iterator it = keyMapList.iterator();
-            List<KeyMapDao> keyMapDaoList = new ArrayList<KeyMapDao>();
+            List<KeyMapM> keyMapMList = new ArrayList<KeyMapM>();
             List<String> mbrNoList = new ArrayList<String>();
             while(it.hasNext()) {
                 KeyMapModel kmm = mapper.convertValue(it.next(), KeyMapModel.class);
                 
                 List<String> apiKeyList = (List<String>)kmm.getApiKeys();           
                 for(int i = 0; i < apiKeyList.size(); i++) {
-                    KeyMapDao kms  = new KeyMapDao();
+                    KeyMapM kms  = new KeyMapM();
                     kms.setMbrNo(kmm.getMbrNo());
                     kms.setAccessCode(kmm.getAccessCode());
                     kms.setApiKey(apiKeyList.get(i));   
-                    keyMapDaoList.add(kms);
+                    keyMapMList.add(kms);
                 }
                 mbrNoList.add(kmm.getMbrNo());
             }
             
             KeyMapDef.removeAllAccessCode(mbrNoList);
             if(!deleteOnly) {
-                KeyMapDef.insertAll(keyMapDaoList);
+                KeyMapDef.insertAll(keyMapMList);
             }
             
             resultMap.put("returnCode",  1);

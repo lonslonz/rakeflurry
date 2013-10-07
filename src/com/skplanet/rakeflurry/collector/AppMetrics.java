@@ -25,13 +25,14 @@ import com.skplanet.rakeflurry.dashboard.ApiSummary;
 import com.skplanet.rakeflurry.dashboard.DashBoard;
 import com.skplanet.rakeflurry.dashboard.RunningStatus;
 import com.skplanet.rakeflurry.dashboard.WorkStatus;
-import com.skplanet.rakeflurry.db.HiberUtil;
 import com.skplanet.rakeflurry.file.FileManager;
 import com.skplanet.rakeflurry.meta.AppMetricsApi;
 import com.skplanet.rakeflurry.meta.KeyMapDef;
+import com.skplanet.rakeflurry.model.AppMetricsM;
 import com.skplanet.rakeflurry.model.CollectOptions;
 import com.skplanet.rakeflurry.model.CollectParams;
 import com.skplanet.rakeflurry.service.CollectApi;
+import com.skplanet.rakeflurry.util.HiberUtil;
 
 // certain api key, access code
 // middle of api key
@@ -40,8 +41,9 @@ public class AppMetrics {
     private Logger logger = LoggerFactory.getLogger(AppMetrics.class);
     private static int SLEEP_TIME_MSEC = 1000;
     private static String URL_TEMPLATE = 
-            "http://api.flurry.com/appMetrics/%s?apiAccessCode=%s&apiKey=%s&startDate=%s&endDate=%s";
-            //"http://api.flurry.com/appMetrics/%s?apiAccessCode=%s&apiKey=%s&startDate=%s&endDate=%s&country=ALL";
+            "http://api.flurry.com/appMetrics/%s?apiAccessCode=%s&apiKey=%s&startDate=%s&endDate=%s%s";
+    private static String GROUP_BY_MONTHLY = "&groupBy=MONTHS";
+    private static String GROUP_BY_WEEKLY = "&groupBy=WEEKS";
     private long totalElapsed = 0;
     private long totalCount = 0;
     private long errorCount = 0;
@@ -107,7 +109,7 @@ public class AppMetrics {
    
     public Boolean collectApiKey(AccessCodeSummary acs, ApiKeySummary aks) throws Exception {
         
-        List<String> apiList = AppMetricsApi.getInstance().getApiList();
+        List<AppMetricsM> apiList = AppMetricsApi.getInstance().getApiList();
 
         Boolean error = false;
         
@@ -156,8 +158,18 @@ public class AppMetrics {
         HiberUtil.update(aks, "update finishing api key.");
         return error;
     }
-    
-    public String requestApiWithRetry(AccessCodeSummary acs, ApiKeySummary aks, ApiSummary as) throws Exception {
+    private String getGroupByCond(ApiSummary as) {
+        if(as.getMonthly() == 1) {
+            return GROUP_BY_MONTHLY;
+        } 
+        
+        if(as.getWeekly() == 1) {
+            return GROUP_BY_WEEKLY;
+        }
+        
+        return "";
+    }
+    private  String requestApiWithRetry(AccessCodeSummary acs, ApiKeySummary aks, ApiSummary as) throws Exception {
         int retryCount = 0;
         String result = null;
         String url = null;
@@ -172,13 +184,14 @@ public class AppMetrics {
         while(true) {
             try {
                 long start = System.currentTimeMillis();
-                // one month
+
                 url = String.format(URL_TEMPLATE, 
                                     as.getApi(),
                                     acs.getAccessCode(), 
                                     aks.getApiKey(),
                                     dashboard.getCallStartDay(),
-                                    dashboard.getCallEndDay());
+                                    dashboard.getCallEndDay(),
+                                    getGroupByCond(as));
                 
                 logger.info("url : {}",  url);
                 result = HttpRequest.sendHttpGet(url);

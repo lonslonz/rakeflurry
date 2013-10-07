@@ -1,7 +1,7 @@
 package com.skplanet.rakeflurry.service;
 
 import java.util.HashMap;
-import java.util.List;
+
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -22,8 +22,7 @@ import com.skplanet.rakeflurry.file.FileManager;
 import com.skplanet.rakeflurry.meta.AppMetricsApi;
 import com.skplanet.rakeflurry.model.CollectOptions;
 import com.skplanet.rakeflurry.model.CollectParams;
-import com.skplanet.rakeflurry.model.KeyMapModel;
-import com.skplanet.rakeflurry.util.Right;
+
 
 // collect a part of accesscodes of dashboard.
 public class CollectPartApi implements SimpleService {

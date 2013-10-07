@@ -28,12 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.skplanet.rakeflurry.collector.PartInfo;
-import com.skplanet.rakeflurry.db.HiberUtil;
-import com.skplanet.rakeflurry.db.KeyMapDao;
 import com.skplanet.rakeflurry.meta.KeyMapDef;
 import com.skplanet.rakeflurry.model.CollectOptions;
 import com.skplanet.rakeflurry.model.CollectParams;
+import com.skplanet.rakeflurry.model.KeyMapM;
 import com.skplanet.rakeflurry.model.KeyMapModel;
+import com.skplanet.rakeflurry.util.HiberUtil;
 
 @Entity
 @Table(name="tb_dashboard")

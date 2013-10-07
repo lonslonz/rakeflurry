@@ -28,14 +28,6 @@ import com.skplanet.rakeflurry.model.CollectParams;
 import com.skplanet.rakeflurry.util.FileSystemHelper;
 import com.skplanet.rakeflurry.util.Right;
 
-//TODO :
-// 1. error task retry automatics
-// 2. only some task execute
-// 3. multi-thread
-
-
-// 
-// duration : 30
 
 public class CollectApi implements SimpleService {
     private Logger logger = LoggerFactory.getLogger(CollectApi.class);
