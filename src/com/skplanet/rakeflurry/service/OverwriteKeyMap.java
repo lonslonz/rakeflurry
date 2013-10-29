@@ -63,9 +63,14 @@ public class OverwriteKeyMap implements SimpleService {
                 mbrNoList.add(kmm.getMbrNo());
             }
             
-            KeyMapDef.removeAllAccessCode(mbrNoList);
-            if(!deleteOnly) {
-                KeyMapDef.insertAll(keyMapMList);
+//            KeyMapDef.removeAllAccessCode(mbrNoList);
+//            if(!deleteOnly) {
+//                KeyMapDef.insertAll(keyMapMList);
+//            }
+            if(deleteOnly) {
+                KeyMapDef.removeAllAccessCode(mbrNoList);
+            } else {
+                KeyMapDef.overwriteAll(mbrNoList, keyMapMList);
             }
             
             resultMap.put("returnCode",  1);
@@ -74,10 +79,11 @@ public class OverwriteKeyMap implements SimpleService {
             resultMap.put("returnCode",  -1);
             resultMap.put("returnDesc",  "fail");
             resultMap.put("message", e.getMessage());
+            resultMap.put("exeception", StringUtil.exception2Str(e));
             logger.error(StringUtil.exception2Str(e));
             
             Alerter alerter = new Alerter();
-            alerter.errorOverwriteKeyMapService(e.getMessage());
+            alerter.errorOverwriteKeyMapService(e.getMessage(), StringUtil.exception2Str(e));
             
             throw e;
         } finally {
@@ -85,6 +91,4 @@ public class OverwriteKeyMap implements SimpleService {
             logger.info("complete overwrite key map : {} ", response.getParams());
         }
     }
-    
-    
 }

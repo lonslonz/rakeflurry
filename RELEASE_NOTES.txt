@@ -1,8 +1,11 @@
 
-                   Rakeflurry 0.8.0
+                   Rakeflurry 0.8.1
                    Release Notes
 
 --------------------
+0.8.1
+- #5 : a trans. for overwriting keymap.
+
 0.8.0
 - #4 : add monthly api
 - add info.txt

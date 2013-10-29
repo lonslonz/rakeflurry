@@ -125,12 +125,12 @@ public class Alerter {
             logger.error("send http error : {}", StringUtil.exception2Str(e));
         }
     }
-    public void errorOverwriteKeyMapService(String msg) throws Exception {
+    public void errorOverwriteKeyMapService(String msg, String details) throws Exception {
         try {
             setSubject("ERROR", "Overwriting KeyMap Service failed.");
             this.message = String.format(
-                    "%s", 
-                    msg);
+                    "\nMessage : %s\nDetails : %s\n", 
+                    msg, details);
             this.message = getCommonMsg() + this.message;
             sendHttp();
         } catch (Exception e) {

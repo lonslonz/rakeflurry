@@ -118,6 +118,35 @@ public class KeyMapDef {
             session.close();
         }
     }
+    public static void overwriteAll(List<String> mbrNoList, List<KeyMapM> keyMapMList) throws Exception  {
+        Logger logger = LoggerFactory.getLogger(KeyMapDef.class);
+        Session session = HiberUtil.openSession();
+        Transaction tx = null;
+        
+        try {
+            tx = session.beginTransaction();
+            
+            String hql  = "DELETE FROM KeyMapM K";
+            Query query = session.createQuery(hql);
+            int result = query.executeUpdate();
+            logger.info("remove all keymap table, affected : {}", result);
+            
+            for(int i = 0; i < keyMapMList.size(); i++) {
+                KeyMapM obj = keyMapMList.get(i);
+                session.save(obj);
+                logger.info("save : mbr no : {}, access code : {}, api key : {}", 
+                            new Object[]{obj.getMbrNo(), obj.getAccessCode(), obj.getApiKey()});
+            }
+            tx.commit();
+        } catch(Exception e) {
+            if(tx != null) {
+                tx.rollback();
+            }
+            throw e;
+        } finally {
+            session.close();
+        }
+    }
     public List<KeyMapModel> getKeyMapList() {
         return keyMapList;
     }
