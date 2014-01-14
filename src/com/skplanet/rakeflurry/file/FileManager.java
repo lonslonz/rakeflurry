@@ -7,6 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +29,11 @@ public class FileManager {
     private static DateFormat dirDateFormat = new SimpleDateFormat("yyyy/MM/dd");
     private static FileManager instance = new FileManager();
     private static String fileFormat = "%s_%s_%s.log";
+    private static String HADOOP_CORE_CONF_FILE = "core-site.xml";
+    private static String HADOOP_HDFS_CONF_FILE = "hdfs-site.xml";
     private URI destUri;
     private String strFullDestUri;
+    private Configuration hadoopConf;
     
     private Logger logger = LoggerFactory.getLogger(FileManager.class);
     
@@ -36,6 +42,8 @@ public class FileManager {
     }
     
     public synchronized void init() throws Exception {
+        
+        readHadoopConf();
         
         String dateDir = dirDateFormat.format(new Date());
         localDataDir = 
@@ -62,16 +70,16 @@ public class FileManager {
         String strUri = ConfigReader.getInstance().getServerConfig().getPropValue("hdfsDestUri");
         destUri = new URI(strUri);
         
-        if(!FileSystemHelper.exists(destUri, "")) {
+        if(!FileSystemHelper.exists(destUri, "", hadoopConf)) {
             throw new Exception("destination dir not exists. " + destUri);
         } 
         
         strFullDestUri = strUri + "/" + hdfsDestDir;
         
-        if(FileSystemHelper.exists(destUri, hdfsDestDir)) {
+        if(FileSystemHelper.exists(destUri, hdfsDestDir, hadoopConf)) {
             logger.info("dir already exists : {}, {}", destUri.getPath(), hdfsDestDir);
         } else {
-            if(FileSystemHelper.mkdir(destUri, hdfsDestDir)) {
+            if(FileSystemHelper.mkdir(destUri, hdfsDestDir, hadoopConf)) {
                 logger.info("hdfs dir created : {}, {}", destUri.getPath(), hdfsDestDir);
                 chmodAllDir(destUri, hdfsDestDir);
             } else {
@@ -97,7 +105,7 @@ public class FileManager {
             sb.append("/");
             logger.info("will chmod : destUri : {}, dir : {}, perm : {}", 
                     new Object[]{destUri, sb, realPerm});
-            FileSystemHelper.chmod(destUri, sb.toString(), realPerm);
+            FileSystemHelper.chmod(destUri, sb.toString(), realPerm, hadoopConf);
             logger.info("chmod : destUri : {}, dir : {}, perm : {}", 
                         new Object[]{destUri, sb, realPerm});
         }
@@ -107,7 +115,7 @@ public class FileManager {
     private void chmodFile(URI destUri, String destFile) throws Exception {
         String permission = ConfigReader.getInstance().getServerConfig().getPropValue("hdfsChmod");
         short realPerm = Short.parseShort(permission, 8);
-        FileSystemHelper.chmod(destUri, destFile, realPerm);
+        FileSystemHelper.chmod(destUri, destFile, realPerm, hadoopConf);
     }
     public boolean copyToHdfs(AccessCodeSummary acs, ApiKeySummary aks, DashBoard dashboard) throws Exception {
         
@@ -121,7 +129,7 @@ public class FileManager {
             
             sourceFile = getDataFileName(acs, aks, dashboard);
             destFile = hdfsDestDir + "/" + sourceFile; 
-            boolean result = FileSystemHelper.copy(sourceUri, sourceFile, destUri, destFile);
+            boolean result = FileSystemHelper.copy(sourceUri, sourceFile, destUri, destFile, hadoopConf);
             chmodFile(destUri,  destFile);
             
             if(!result) {
@@ -141,6 +149,18 @@ public class FileManager {
         } 
         
         return error;
+    }
+    
+    public void readHadoopConf() {
+        hadoopConf = new Configuration();
+        
+        Path confPath = new Path(ConfigReader.getInstance().getServerConfig().getPropValue("hadoopConfDir"),
+                                 HADOOP_CORE_CONF_FILE);
+        Path confPath2 = new Path(ConfigReader.getInstance().getServerConfig().getPropValue("hadoopConfDir"),
+                                HADOOP_HDFS_CONF_FILE);
+        hadoopConf.addResource(confPath);
+        hadoopConf.addResource(confPath2);
+        
     }
     
     //AccessCodeSummary acs, ApiKeySummary aks

@@ -1,8 +1,13 @@
 
-                   Rakeflurry 0.8.1
+                   Rakeflurry 0.8.2
                    Release Notes
 
 --------------------
+0.8.2
+- #6 : hadoop failover support 
+- change dev server.
+- support new cluster in ilsan.
+
 0.8.1
 - #5 : a trans. for overwriting keymap.
 

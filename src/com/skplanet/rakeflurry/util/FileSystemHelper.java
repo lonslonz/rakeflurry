@@ -39,8 +39,8 @@ import com.skplanet.rakeflurry.file.DirStatus;
  
 public class FileSystemHelper {
 
-    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";    
+    
     public static InputStream openFile(URI uri, String file) throws IOException {
         Configuration conf = new Configuration();
         FileSystem fs = FileSystem.get(uri, conf);
@@ -100,11 +100,17 @@ public class FileSystemHelper {
         return files;
     }
     public static boolean mkdir(URI destUri, String destDir) throws Exception {
+        return mkdir(destUri, destDir, null);
+    }
+    public static boolean mkdir(URI destUri, String destDir, Configuration fsConf) throws Exception {
         Logger logger = LoggerFactory.getLogger(FileSystemHelper.class);    
         
-        Configuration conf = new Configuration();
-
-        FileSystem fsDest = FileSystem.get(destUri, conf);
+        FileSystem fsDest;
+        if(fsConf == null) {
+            fsDest = FileSystem.get(destUri,new Configuration());
+        } else {
+            fsDest = FileSystem.get(fsConf);
+        }
         
         String destRelative = getRelative(destUri);
         
@@ -183,15 +189,31 @@ public class FileSystemHelper {
     public static boolean copy(URI sourceUri, String sourceDir, URI destUri, String destDir) throws Exception {
         return copy(sourceUri, sourceDir, destUri, destDir, false, true);
     }
-    
-    // when sourceDir is file, action is the same as normal file system.
-    // when sourceDir is dir, action is in hadoop context.
+    public static boolean copy(URI sourceUri, String sourceDir, URI destUri, String destDir, Configuration fsConf) throws Exception {
+        return copy(sourceUri, sourceDir, destUri, destDir, false, true, fsConf);
+    }
     public static boolean copy(URI sourceUri, String sourceDir, URI destUri, String destDir, 
             boolean deleteSource, boolean overwrite) throws Exception {
         
-        Configuration conf = new Configuration();
+        return copy(sourceUri, sourceDir, destUri, destDir, deleteSource, overwrite, null);
+    }
+    // when sourceDir is file, action is the same as normal file system.
+    // when sourceDir is dir, action is in hadoop context.
+    public static boolean copy(
+            URI sourceUri, String sourceDir, URI destUri, String destDir, 
+            boolean deleteSource, boolean overwrite, Configuration fsConf) throws Exception {
+        
+        FileSystem fsDest;
+        Configuration conf;
+        
+        if(fsConf == null) {
+            conf = new Configuration();
+            fsDest = FileSystem.get(destUri, conf);
+        } else {
+            conf = fsConf;
+            fsDest = FileSystem.get(fsConf);
+        }
         FileSystem fsSource = FileSystem.get(sourceUri, conf);
-        FileSystem fsDest = FileSystem.get(destUri, conf);
         
         String sourceRelative = getRelative(sourceUri);
         String destRelative = getRelative(destUri);
@@ -201,6 +223,7 @@ public class FileSystemHelper {
         
         return FileUtil.copy(fsSource, sourcePath, fsDest, destPath, deleteSource, overwrite, conf);
     }
+    
     @Deprecated
     public static long copyMerge(
             URI sourceUri, URI destUri, String destFile) throws Exception  {
@@ -537,9 +560,17 @@ public class FileSystemHelper {
         return sdf.format(new Date());
     }
     public static boolean exists(URI uri, String file) throws Exception {
-        Configuration conf = new Configuration();
-
-        FileSystem fsDest = FileSystem.get(uri, conf);
+        
+        return exists(uri, file, null);
+    }
+    public static boolean exists(URI uri, String file, Configuration fsConf) throws Exception {
+        
+        FileSystem fsDest;
+        if(fsConf == null) {
+            fsDest = FileSystem.get(uri,new Configuration());
+        } else {
+            fsDest = FileSystem.get(fsConf);
+        }
         
         String destRelative = FileSystemHelper.getRelative(uri);
         
@@ -572,8 +603,15 @@ public class FileSystemHelper {
     }
     public static void chmod(URI uri, String file, short permission) throws Exception {
         
-        Configuration conf = new Configuration();
-        FileSystem fsDest = FileSystem.get(uri, conf);
+        chmod(uri, file, permission, null);
+    }
+    public static void chmod(URI uri, String file, short permission, Configuration fsConf) throws Exception {
+        FileSystem fsDest;
+        if(fsConf == null) {
+            fsDest = FileSystem.get(uri,new Configuration());
+        } else {
+            fsDest = FileSystem.get(fsConf);
+        }
         String destRelative = FileSystemHelper.getRelative(uri);
         Path destPath = makePathFrom2Dir(destRelative,file);
         

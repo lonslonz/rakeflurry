@@ -8,13 +8,16 @@
       <artifact pattern="${github.repo.local}/release/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]" />
     </filesystem>
 -->
+    <ibiblio name="cdh" root="https://repository.cloudera.com/artifactory/cloudera-repos/" m2compatible="true" />
     <url name="github-repo">
       <ivy pattern="https://github.com/lonslonz/maven_repo/raw/master/release/[organisation]/[module]/ivy-[revision].xml" />
       <artifact pattern="https://github.com/lonslonz/maven_repo/raw/master/release/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]" />
     </url>
 
     <chain name="my-chain" returnFirst="true">
+
       <resolver ref="github-repo"/>
+      <resolver ref="cdh"/>
       <resolver ref="default"/>
     </chain>
   </resolvers>
