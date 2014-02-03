@@ -1,8 +1,11 @@
 
-                   Rakeflurry 0.8.2
+                   Rakeflurry 0.8.3
                    Release Notes
 
 --------------------
+0.8.3
+- add backup_localdata shell 
+
 0.8.2
 - #6 : hadoop failover support 
 - change dev server.
