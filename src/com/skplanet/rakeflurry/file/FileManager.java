@@ -34,6 +34,7 @@ public class FileManager {
     private URI destUri;
     private String strFullDestUri;
     private Configuration hadoopConf;
+    private Boolean useHadoop = true;
     
     private Logger logger = LoggerFactory.getLogger(FileManager.class);
     
@@ -42,7 +43,8 @@ public class FileManager {
     }
     
     public synchronized void init() throws Exception {
-        
+        useHadoop = Boolean.parseBoolean(ConfigReader.getInstance().getServerConfig().getPropValue("useHadoop"));
+    	
         readHadoopConf();
         
         String dateDir = dirDateFormat.format(new Date());
@@ -65,7 +67,14 @@ public class FileManager {
         mkdirHdfs();
         logger.info("FileManager initialized.");
     }
+    private Boolean useHadoop() {
+    	return useHadoop;
+    }
     private void mkdirHdfs() throws Exception {
+    	if(!useHadoop()) {
+    		return;
+    	}
+    	
         // acs hdfs file + aks file name 
         String strUri = ConfigReader.getInstance().getServerConfig().getPropValue("hdfsDestUri");
         destUri = new URI(strUri);
@@ -88,7 +97,10 @@ public class FileManager {
         }
     }
     private void chmodAllDir(URI destUri, String destDir) throws Exception {
-        
+    	if(!useHadoop()) {
+    		return;
+    	}
+    	
         String[] destDirArray = destDir.split("/");
         
         String curr;
@@ -113,12 +125,20 @@ public class FileManager {
     }
    
     private void chmodFile(URI destUri, String destFile) throws Exception {
+    	if(!useHadoop()) {
+    		return;
+    	}
+    	
         String permission = ConfigReader.getInstance().getServerConfig().getPropValue("hdfsChmod");
         short realPerm = Short.parseShort(permission, 8);
         FileSystemHelper.chmod(destUri, destFile, realPerm, hadoopConf);
     }
     public boolean copyToHdfs(AccessCodeSummary acs, ApiKeySummary aks, DashBoard dashboard) throws Exception {
         
+    	if(!useHadoop()) {
+    		return false;
+    	}
+    	
         URI sourceUri = null;
         String sourceFile = null;
         boolean error = false;
@@ -152,6 +172,10 @@ public class FileManager {
     }
     
     public void readHadoopConf() {
+    	if(!useHadoop()) {
+    		return;
+    	}
+    	
         hadoopConf = new Configuration();
         
         Path confPath = new Path(ConfigReader.getInstance().getServerConfig().getPropValue("hadoopConfDir"),

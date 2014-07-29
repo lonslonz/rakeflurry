@@ -5,6 +5,8 @@
 --------------------
 0.8.3
 - add backup_localdata shell 
+- ignore hadoop copying
+- change mail server
 
 0.8.2
 - #6 : hadoop failover support 
